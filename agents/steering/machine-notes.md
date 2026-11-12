@@ -11,7 +11,8 @@
 
 - `mise` is installed at `~/.local/bin/mise` and activated in `~/.zshrc`:
   `eval "$(~/.local/bin/mise activate zsh)"`.
-- Versions are pinned in `.mise.toml` at the root: python 3.12, uv, node 22, pnpm, just 1.59.0, gitleaks 8.30.1, typst, actionlint 1.7.12.
+- Versions are pinned in `.mise.toml` at the root: uv, node 22, pnpm, just 1.59.0, gitleaks 8.30.1, typst, actionlint 1.7.12.
+  Python is not pinned there: the tools use the system `/usr/bin/python3` (3.12, has PyYAML); CI pins python with `actions/setup-python`.
   Run `mise install` after a change. Bump versions in a PR, never ad hoc.
 - System `python3` is 3.12 with PyYAML 6.0.1. `pytest` is not assumed: tests use `unittest`.
 - A non-interactive shell (agent Bash tool, cron) may not load `~/.zshrc`. If `just` or `gitleaks` is not found, call `~/.local/bin/mise exec -- <cmd>` or use the absolute shim path.
