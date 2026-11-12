@@ -23,3 +23,6 @@ __pycache__/
 
 # Local VS Code workspace with the private-manifest repos (tools/ws/workspace)
 *.local.code-workspace
+
+# Build output (tools/skills/pack writes dist/skills/*.zip)
+dist/
