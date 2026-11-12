@@ -1,0 +1,17 @@
+# Workspace manifest (spec section 4.5): every repo in the org, its local path,
+# visibility and area. tools/ws/sync and tools/ws/status read this file.
+# Every repo lives in the one org below; per-repo owners are not allowed.
+# Add a line here and a folder in nghiep-pham-ecosys.code-workspace for each new repo.
+# Repos whose names must stay out of public files go in the private overlay
+# private/ops/repos.private.yaml instead (same schema, merged by the tools);
+# `just ws-workspace` writes a gitignored local workspace that includes them.
+org: nghiep-pham-ecosys
+repos:
+  - { name: ecosys,                 path: .,                                 visibility: public,  area: ecosys,  default_branch: main }
+  - { name: .github,                path: meta/.github,                      visibility: public,  area: ecosys,  default_branch: main }
+  - { name: ops,                    path: private/ops,                       visibility: private, area: ecosys,  default_branch: main }
+  - { name: vault,                  path: private/vault,                     visibility: private, area: profile, default_branch: main }
+  - { name: lab-to-prod,            path: projects/lab-to-prod,              visibility: public,  area: content, default_branch: main }
+  - { name: claude-for-everyone-vi, path: projects/claude-for-everyone-vi,   visibility: private, area: learn,   default_branch: main }
+  - { name: physic-ai-for-everyone, path: projects/physic-ai-for-everyone,   visibility: private, area: lab,     default_branch: main }
+  - { name: nghiep-motion-studio,   path: projects/nghiep-motion-studio,     visibility: public,  area: lab,     default_branch: main }

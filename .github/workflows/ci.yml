@@ -1,0 +1,153 @@
+# CI for the ecosys root repo (spec §9.7, §12 Phase 0 step 5).
+# Every action is pinned by full commit SHA. Only GitHub-owned actions are used;
+# gitleaks and actionlint come from their release tarballs, checked by sha256.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  GITLEAKS_VERSION: 8.30.1
+  GITLEAKS_SHA256: 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+  ACTIONLINT_VERSION: 1.7.12
+  ACTIONLINT_SHA256: 8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8
+
+jobs:
+  hook-tests:
+    name: hook-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Run hook tests
+        run: python3 -m unittest discover -v -s .claude/hooks/tests -p 'test_*.py'
+
+  tool-tests:
+    name: tool-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Install PyYAML
+        run: python3 -m pip install --disable-pip-version-check pyyaml==6.0.1
+      - name: Run tool tests
+        run: |
+          status=0
+          for dir in tools/ws/tests tools/ship/tests tools/jobs/tests; do
+            echo "::group::${dir}"
+            if [ ! -d "${dir}" ]; then
+              echo "::error::missing test directory ${dir}"
+              status=1
+            elif ! python3 -m unittest discover -v -s "${dir}" -p 'test_*.py'; then
+              status=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "${status}"
+
+  gitleaks:
+    name: gitleaks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install gitleaks
+        run: |
+          set -euo pipefail
+          base="https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}"
+          tarball="gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          dir="${RUNNER_TEMP}/gitleaks"
+          mkdir -p "${dir}"
+          curl -fsSL --retry 3 -o "${dir}/${tarball}" "${base}/${tarball}"
+          curl -fsSL --retry 3 -o "${dir}/checksums.txt" "${base}/gitleaks_${GITLEAKS_VERSION}_checksums.txt"
+          # The pinned hash must match the release checksums file and the download.
+          grep -qx "${GITLEAKS_SHA256}  ${tarball}" "${dir}/checksums.txt"
+          echo "${GITLEAKS_SHA256}  ${dir}/${tarball}" | sha256sum -c -
+          tar -xzf "${dir}/${tarball}" -C "${dir}" gitleaks
+          echo "${dir}" >> "${GITHUB_PATH}"
+      - name: Scan full history
+        run: gitleaks git --redact --no-banner -v .
+
+  tracked-children:
+    name: tracked-children
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: No child repo, scratch or private-only path is tracked
+        run: |
+          set -euo pipefail
+          # Keep this path list in sync with the justfile recipe tracked-children.
+          tracked="$(git ls-files -- meta private projects .tmp-session import skill docs/BOOTSTRAP-PROMPT.md)"
+          if [ -n "${tracked}" ]; then
+            echo "::error::These paths must never be tracked in ecosys (spec §4.3):"
+            printf '%s\n' "${tracked}"
+            exit 1
+          fi
+          echo "OK: nothing tracked under meta/ private/ projects/ .tmp-session/ import/ skill/, and no docs/BOOTSTRAP-PROMPT.md"
+
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install actionlint
+        run: |
+          set -euo pipefail
+          base="https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}"
+          tarball="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          dir="${RUNNER_TEMP}/actionlint"
+          mkdir -p "${dir}"
+          curl -fsSL --retry 3 -o "${dir}/${tarball}" "${base}/${tarball}"
+          curl -fsSL --retry 3 -o "${dir}/checksums.txt" "${base}/actionlint_${ACTIONLINT_VERSION}_checksums.txt"
+          grep -qx "${ACTIONLINT_SHA256}  ${tarball}" "${dir}/checksums.txt"
+          echo "${ACTIONLINT_SHA256}  ${dir}/${tarball}" | sha256sum -c -
+          tar -xzf "${dir}/${tarball}" -C "${dir}" actionlint
+          echo "${dir}" >> "${GITHUB_PATH}"
+      - name: Lint workflows
+        run: actionlint -color
+
+  ci-result:
+    name: ci-result
+    if: always()
+    needs: [hook-tests, tool-tests, gitleaks, tracked-children, actionlint]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Every job must succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          echo "${NEEDS}" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          if ! echo "${NEEDS}" | jq -e 'length > 0 and all(.[]; .result == "success")' > /dev/null; then
+            echo "::error::ci-result fails because at least one job did not succeed"
+            exit 1
+          fi

@@ -1,0 +1,25 @@
+# Child repos and session scratch (spec §4.3) — CI fails if anything under these is tracked
+meta/
+private/
+projects/
+.tmp-session/
+import/
+# Day-job skill templates: pattern source only, deleted after Phase 0 (never public)
+skill/
+# Bootstrap prompt names private things (never commit)
+docs/BOOTSTRAP-PROMPT.md
+# Secrets
+.env*
+!.env.example
+*.pem
+*.key
+# Local Claude settings
+.claude/settings.local.json
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+
+# Local VS Code workspace with the private-manifest repos (tools/ws/workspace)
+*.local.code-workspace

@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Clone missing repos and fast-forward clean ones (spec section 4.5).
+
+For each repo in repos.yaml:
+  - missing clone      -> git clone https://github.com/<org>/<name>.git <path>
+                          (the root entry, path ".", is never cloned)
+  - existing clone     -> git fetch (no --prune), then fast-forward only when the
+                          work tree is clean AND the current branch is the
+                          default branch
+  - anything else      -> reported as "skipped: ..." and left untouched
+
+Repos come from repos.yaml plus, when it exists, the private overlay
+private/ops/repos.private.yaml (same schema; names and paths must not collide).
+Overlay rows are marked "[private-manifest]". When the overlay is absent at the
+start (a fresh machine) but appears once the ops repo is cloned, its repos are
+synced in the same run.
+
+Hooks: when a cloned or existing repo has a .githooks/ folder and
+core.hooksPath is unset, it runs `git config core.hooksPath .githooks` and
+reports it ("hooks: ..."). A hooksPath set to another value is reported, not
+changed. With --dry-run it only says what it would set.
+
+It never merges, rebases, resets, stashes or checks out a branch, and never
+prunes remote-tracking refs.
+Exit code: 0 when every repo is synced or skipped, 1 when any repo errored,
+2 on a bad manifest or bad arguments.
+"""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import _wslib as ws  # noqa: E402
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="ws-sync", description=__doc__.splitlines()[0])
+    parser.add_argument("--dry-run", action="store_true", help="show what would happen; no clone, no fetch, no fast-forward")
+    ws.add_manifest_args(parser)
+    parser.add_argument("--only", action="append", default=[], metavar="NAME", help="sync only this repo (repeatable)")
+    parser.add_argument("--url-template", default=ws.DEFAULT_URL_TEMPLATE, help=argparse.SUPPRESS)
+    args = parser.parse_args(argv)
+
+    root, manifest_path, private_path = ws.manifest_paths(args)
+    try:
+        manifest, loaded = ws.load_workspace_manifest(manifest_path, private_path)
+    except ws.ManifestError as exc:
+        print(f"ws-sync: {exc}", file=sys.stderr)
+        return 2
+
+    repos = manifest.repos
+    if args.only:
+        unknown = sorted(set(args.only) - {r.name for r in repos})
+        if unknown:
+            print(f"ws-sync: unknown repo(s): {', '.join(unknown)}", file=sys.stderr)
+            return 2
+        repos = [r for r in repos if r.name in args.only]
+
+    errors = _sync_all(root, manifest.org, repos, args)
+
+    # Fresh machine: the overlay lives in the ops repo, which this run may just have cloned.
+    if loaded is None and private_path is not None and private_path.is_file() and not args.only:
+        try:
+            merged, _ = ws.load_workspace_manifest(manifest_path, private_path)
+        except ws.ManifestError as exc:
+            print(f"ws-sync: {exc}", file=sys.stderr)
+            return 2
+        extra = [r for r in merged.repos if r.private_manifest]
+        if extra:
+            errors += _sync_all(root, merged.org, extra, args)
+
+    if args.dry_run:
+        print("(dry run: nothing was changed)")
+    return 1 if errors else 0
+
+
+def _sync_all(root: Path, org: str, repos: list[ws.Repo], args) -> int:
+    if not repos:
+        return 0
+    name_w = max(len(r.name) for r in repos)
+    path_w = max(len(r.path) for r in repos)
+    errors = 0
+    for repo in repos:
+        result = ws.sync_repo(root, org, repo, dry_run=args.dry_run, url_template=args.url_template)
+        errors += result.is_error
+        label = "error: " + result.message if result.is_error else result.message
+        mark = f"[{ws.PRIVATE_MARK}] " if repo.private_manifest else ""
+        print(f"{repo.name.ljust(name_w)}  {repo.path.ljust(path_w)}  {mark}{label}", flush=True)
+    return errors
+
+
+if __name__ == "__main__":
+    sys.exit(main())

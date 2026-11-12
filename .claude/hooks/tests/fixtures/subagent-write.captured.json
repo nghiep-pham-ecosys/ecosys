@@ -1,0 +1,20 @@
+{
+  "session_id": "00000000-0000-4000-8000-000000000001",
+  "transcript_path": "/tmp/claude-fixture/transcript.jsonl",
+  "cwd": "/home/nghiep/projects/nghiep-pham-ecosys",
+  "scratchpad_dir": "/tmp/claude-fixture/scratchpad",
+  "prompt_id": "00000000-0000-4000-8000-000000000002",
+  "permission_mode": "acceptEdits",
+  "agent_id": "a0000000000000001",
+  "agent_type": "workflow-subagent",
+  "effort": {
+    "level": "high"
+  },
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/home/nghiep/projects/nghiep-pham-ecosys/.tmp-session/wt/s1-lane-a/docs/notes.md",
+    "content": "# Notes\n\nExample Co sample text.\n"
+  },
+  "tool_use_id": "toolu_FakeFixtureSubWrite00001"
+}

@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+"""Scan tracked files for terms in the local denylist (spec section 10.2).
+
+The denylist lives outside the repo, one term per line ('#' starts a comment).
+Matching is a case-insensitive substring match. Output names only the place
+of a hit ("path:line", or "path:name" when the file name itself matches) and
+never the term. A file name that contains a term is printed with the term
+masked as "***".
+
+Default input: `git ls-files -z` of the current repo, read from the work tree.
+--staged reads the staged (index) content instead. Explicit paths scan just
+those files.
+
+Exit code: 0 clean or skipped, 1 hits found, 2 usage or git error.
+When the denylist file is missing: silent exit 0 in CI (CI=true), a warning
+and exit 0 elsewhere.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+DEFAULT_DENYLIST = Path.home() / ".config" / "nghiep-pham-ecosys" / "denylist.txt"
+BINARY_SNIFF = 8192
+MAX_BYTES = 20 * 1024 * 1024
+
+
+def load_terms(path: Path) -> list[str]:
+    terms = []
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        term = raw.strip()
+        if term and not term.startswith("#"):
+            terms.append(term.casefold())
+    return terms
+
+
+def in_ci() -> bool:
+    return os.environ.get("CI", "").strip().lower() in ("1", "true", "yes")
+
+
+def git_lines(args: list[str]) -> list[str]:
+    proc = subprocess.run(["git", *args], capture_output=True)
+    if proc.returncode != 0:
+        msg = proc.stderr.decode("utf-8", "replace").strip().splitlines()
+        raise RuntimeError(msg[0] if msg else f"git {args[0]} failed")
+    return [p for p in proc.stdout.decode("utf-8", "surrogateescape").split("\0") if p]
+
+
+def read_worktree(path: str) -> bytes | None:
+    p = Path(path)
+    if p.is_symlink() or not p.is_file():
+        return None  # symlinks, submodules, deleted files: the target is scanned on its own
+    if p.stat().st_size > MAX_BYTES:
+        return None
+    return p.read_bytes()
+
+
+def read_staged(path: str) -> bytes | None:
+    proc = subprocess.run(["git", "cat-file", "-p", f":{path}"], capture_output=True)
+    return proc.stdout if proc.returncode == 0 else None
+
+
+def mask(text: str, terms: list[str]) -> str:
+    for term in terms:
+        text = re.sub(re.escape(term), "***", text, flags=re.IGNORECASE)
+    return text
+
+
+def scan(paths: list[str], terms: list[str], reader) -> list[str]:
+    """Return hit locations as 'path:line' or 'path:name'. Never the term."""
+    hits = []
+    for path in paths:
+        shown = mask(path, terms)
+        if any(t in path.casefold() for t in terms):
+            hits.append(f"{shown}:name")
+        data = reader(path)
+        if data is None or b"\0" in data[:BINARY_SNIFF]:
+            continue
+        text = data.decode("utf-8", errors="replace")
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            folded = line.casefold()
+            if any(t in folded for t in terms):
+                hits.append(f"{shown}:{lineno}")
+    return hits
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="denylist-scan", description=__doc__.splitlines()[0])
+    parser.add_argument("paths", nargs="*", help="files to scan (default: every tracked file)")
+    parser.add_argument("--denylist", type=Path, default=DEFAULT_DENYLIST, help="denylist file (default: the local one)")
+    parser.add_argument("--staged", action="store_true", help="scan staged content of staged files")
+    args = parser.parse_args(argv)
+
+    if not args.denylist.is_file():
+        if not in_ci():
+            print("denylist-scan: no local denylist file; scan skipped", file=sys.stderr)
+        return 0
+    try:
+        terms = load_terms(args.denylist)
+    except OSError:
+        print("denylist-scan: cannot read the denylist file", file=sys.stderr)
+        return 2
+    if not terms:
+        print("denylist-scan: denylist is empty; scan skipped", file=sys.stderr)
+        return 0
+
+    try:
+        if args.paths:
+            paths = args.paths
+        elif args.staged:
+            paths = git_lines(["diff", "--cached", "--name-only", "--diff-filter=ACMR", "-z"])
+        else:
+            paths = git_lines(["ls-files", "-z"])
+    except (RuntimeError, OSError) as exc:
+        print(f"denylist-scan: {exc}", file=sys.stderr)
+        return 2
+
+    reader = read_staged if args.staged else read_worktree
+    hits = scan(paths, terms, reader)
+    for hit in hits:
+        print(hit)
+    files = len({h.rsplit(":", 1)[0] for h in hits})
+    if hits:
+        print(f"denylist-scan: {len(hits)} hit(s) in {files} file(s)", file=sys.stderr)
+        return 1
+    print(f"denylist-scan: clean ({len(paths)} file(s))", file=sys.stderr)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

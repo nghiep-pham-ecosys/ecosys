@@ -1,0 +1,74 @@
+#!/usr/bin/env python3
+"""Check the job pipeline: validate applications.yaml and list what is due.
+
+Usage:
+  tools/jobs/check [--data PATH] [--skipped PATH] [--today YYYY-MM-DD]
+                   [--close-after-days N] [--validate-only]
+
+Sections: VALIDATION, N-DAY CLOSURES (proposals only, N = --close-after-days,
+default 30), FOLLOW-UPS DUE THIS WEEK,
+INTERVIEW PREP (48 h), NEXT ACTIONS, STAGES.
+Exit codes: 0 ok, 1 validation errors, 2 bad arguments or unreadable file.
+The tool never writes the data file. Spec: docs/spec.md section 5.2.
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _jobslib as jl  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_DATA = ROOT / "private" / "ops" / "jobs" / "applications.yaml"
+
+
+def _iso_day(text: str) -> dt.date:
+    try:
+        return dt.date.fromisoformat(text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"not a YYYY-MM-DD date: {text}") from exc
+
+
+def _positive_int(text: str) -> int:
+    try:
+        value = int(text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(f"not an integer: {text}") from exc
+    if value < 1:
+        raise argparse.ArgumentTypeError(f"must be 1 or more: {text}")
+    return value
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(prog="tools/jobs/check", description=__doc__.split("\n")[0])
+    ap.add_argument("--data", default=str(DEFAULT_DATA), help="applications.yaml (default: private/ops/jobs/applications.yaml)")
+    ap.add_argument("--skipped", help="skipped.yaml to validate as well (optional)")
+    ap.add_argument("--today", type=_iso_day, default=dt.date.today(), help="reference date, default today")
+    ap.add_argument("--close-after-days", type=_positive_int, default=jl.CLOSURE_DAYS, metavar="N",
+                    help=f"propose applied/screen rows as ghosted after N days without contact (default {jl.CLOSURE_DAYS})")
+    ap.add_argument("--validate-only", action="store_true", help="print only the VALIDATION section")
+    args = ap.parse_args(argv)
+
+    try:
+        records = jl.load_list(args.data, "data")
+        skipped = jl.load_list(args.skipped, "skipped") if args.skipped else None
+    except jl.DataError as exc:
+        print(f"jobs check: {exc}", file=sys.stderr)
+        return 2
+
+    errors, warnings = jl.validate(records, args.today, skipped)
+    sys.stdout.write(jl.render(
+        records, args.today, errors, warnings, args.data,
+        validate_only=args.validate_only,
+        skipped_count=len(skipped) if skipped is not None else None,
+        close_after_days=args.close_after_days,
+    ))
+    return 1 if errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""Write the local VS Code workspace: the public one plus the private-manifest repos.
+
+nghiep-pham-ecosys.code-workspace (tracked, public) lists only public-safe
+folders. This tool writes nghiep-pham-ecosys.local.code-workspace (gitignored
+by *.local.code-workspace) with the same folders, settings and extensions, plus
+a folder for every repo of repos.yaml and of the private overlay
+private/ops/repos.private.yaml that the public file does not list. Open the
+local file in VS Code to see every repo.
+
+Exit code: 0 when written, 2 on a bad manifest, a bad public workspace file or
+bad arguments.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import _wslib as ws  # noqa: E402
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="ws-workspace", description=__doc__.splitlines()[0])
+    ws.add_manifest_args(parser)
+    parser.add_argument("--base", type=Path, default=None,
+                        help=f"public workspace file to start from (default: <root>/{ws.PUBLIC_WORKSPACE})")
+    parser.add_argument("--output", type=Path, default=None,
+                        help=f"file to write (default: <root>/{ws.LOCAL_WORKSPACE})")
+    parser.add_argument("--stdout", action="store_true", help="print the workspace instead of writing it")
+    args = parser.parse_args(argv)
+
+    root, manifest_path, private_path = ws.manifest_paths(args)
+    try:
+        manifest, loaded = ws.load_workspace_manifest(manifest_path, private_path)
+    except ws.ManifestError as exc:
+        print(f"ws-workspace: {exc}", file=sys.stderr)
+        return 2
+
+    base_path = args.base or root / ws.PUBLIC_WORKSPACE
+    base = None
+    if base_path.is_file():
+        try:
+            base = json.loads(ws.strip_jsonc_comments(base_path.read_text(encoding="utf-8")))
+        except (OSError, json.JSONDecodeError) as exc:
+            print(f"ws-workspace: cannot read {base_path}: {exc}", file=sys.stderr)
+            return 2
+        if not isinstance(base, dict):
+            print(f"ws-workspace: {base_path} must be a JSON object", file=sys.stderr)
+            return 2
+
+    data = ws.build_local_workspace(manifest, base)
+    text = ws.render_workspace(data)
+    if args.stdout:
+        sys.stdout.write(text)
+        return 0
+
+    output = args.output or root / ws.LOCAL_WORKSPACE
+    output.write_text(text, encoding="utf-8")
+    private_count = sum(r.private_manifest for r in manifest.repos)
+    overlay = f"{private_count} from the private manifest" if loaded else "no private manifest found"
+    print(f"ws-workspace: wrote {output} ({len(data['folders'])} folders, {overlay})")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

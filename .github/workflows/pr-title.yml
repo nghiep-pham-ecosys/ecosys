@@ -1,0 +1,34 @@
+# PR titles become squash commit subjects, so they follow the commit style:
+#   <type>(<optional-scope>)!: <description>
+# The title reaches the shell only through an env var, never through ${{ }}
+# inside run:, so a crafted title cannot inject commands.
+name: pr-title
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions: {}
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  pr-title:
+    name: pr-title
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Check PR title
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          pattern='^(feat|fix|chore|refactor|docs|test|ci)(\([a-z0-9-]+\))?!?: .+'
+          if printf '%s' "${TITLE}" | grep -Eq -- "${pattern}"; then
+            echo "OK: PR title matches ${pattern}"
+          else
+            echo "::error::PR title must match ${pattern}"
+            echo "Example: docs: add org setup runbook"
+            exit 1
+          fi

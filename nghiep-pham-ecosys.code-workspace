@@ -1,0 +1,27 @@
+{
+  "folders": [
+    { "name": "ecosys (root)", "path": "." },
+    { "name": ".github", "path": "meta/.github" },
+    { "name": "ops", "path": "private/ops" },
+    { "name": "vault", "path": "private/vault" },
+    { "name": "lab-to-prod", "path": "projects/lab-to-prod" },
+    { "name": "claude-for-everyone-vi", "path": "projects/claude-for-everyone-vi" },
+    { "name": "physic-ai-for-everyone", "path": "projects/physic-ai-for-everyone" },
+    { "name": "nghiep-motion-studio", "path": "projects/nghiep-motion-studio" }
+  ],
+  "settings": {
+    "files.exclude": {
+      ".tmp-session": true,
+      "**/__pycache__": true
+    },
+    "search.exclude": {
+      ".tmp-session": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "anthropic.claude-code",
+      "redhat.vscode-yaml"
+    ]
+  }
+}
