@@ -55,6 +55,8 @@ def validate(skill_dir: Path) -> dict:
         raise SkillError(f"{skill_md}: name '{name}' does not match folder '{skill_dir.name}'")
     if not isinstance(desc, str) or not desc.strip():
         raise SkillError(f"{skill_md}: description is missing")
+    if "<" in desc or ">" in desc:
+        raise SkillError(f"{skill_md}: description cannot contain '<' or '>' (Claude reads them as XML tags)")
     if len(desc) > MAX_DESCRIPTION:
         raise SkillError(f"{skill_md}: description is {len(desc)} characters (max {MAX_DESCRIPTION})")
     return fm

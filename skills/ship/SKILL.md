@@ -1,6 +1,6 @@
 ---
 name: ship
-description: The path from a branch to "Done" in the nghiep-pham-ecosys org. Covers branch and worktree naming, the commit and PR title format with "Refs <repo>#<n>", checks before merge, merging only through tools/ship/merge, the difference between public repos (rulesets) and private repos on the Free plan (pre-push hook plus merge tool), verifying after merge, marking a board item Done with evidence, and rollback. Use it when a PR is ready, a check is red, before any merge, or before moving an item to Done. It does not cover writing issues or lane briefs (core), session rituals (session), or publishing posts and submitting applications, which always need Nghiep (content, jobs).
+description: The path from a branch to "Done" in the nghiep-pham-ecosys org. Covers branch and worktree naming, the commit and PR title format with a "Refs repo#number" line, checks before merge, merging only through tools/ship/merge, the difference between public repos (rulesets) and private repos on the Free plan (pre-push hook plus merge tool), verifying after merge, marking a board item Done with evidence, and rollback. Use it when a PR is ready, a check is red, before any merge, or before moving an item to Done. It does not cover writing issues or lane briefs (core), session rituals (session), or publishing posts and submitting applications, which always need Nghiep (content, jobs).
 ---
 
 # ship

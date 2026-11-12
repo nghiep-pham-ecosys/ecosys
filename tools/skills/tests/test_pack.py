@@ -65,6 +65,11 @@ class PackTest(unittest.TestCase):
         d2 = make_skill(self.skills, "acme-ok", desc="x" * 1024)
         validate(d2)
 
+    def test_description_rejects_angle_brackets(self):
+        d = make_skill(self.skills, "acme-flow", desc='Use "Refs <repo>#<n>" in commits.')
+        with self.assertRaises(SkillError):
+            validate(d)
+
     def test_nothing_written_when_one_skill_is_invalid(self):
         make_skill(self.skills, "acme-a")
         make_skill(self.skills, "acme-b", desc="")
