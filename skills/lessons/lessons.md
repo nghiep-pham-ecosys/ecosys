@@ -6,7 +6,21 @@ to `guards.md` in the same PR.
 
 ## Working with agents
 
-_No entries yet._
+### Quote the user's request verbatim in every lane brief
+- Why: a workflow lane refused its task because the harness relayed the user's latest message (about something
+  else) and the brief did not show which request the task came from → the brief described the work but not the ask.
+- How: start each brief with "USER REQUEST FOR THIS TASK (verbatim): …" and, when newer messages exist, say that the
+  orchestrator handles them.
+- Seen: workspace session 1 (brand lane), 2026-11
+- Guard: ritual step in the lane brief template (skills/core/references/issue-and-brief.md)
+
+### Leave a lane worktree before shipping from the main session
+- Why: after `cd` into a `.tmp-session/wt/` worktree, the main session's shell stayed there, so ship-guard treated
+  the next `git push` as a lane push and blocked it → the shell cwd persists between tool calls.
+- How: commit inside the worktree, then `cd` back to the workspace root in its own call before pushing or merging.
+  Write worktree paths literally; worktree-guard rejects paths built from shell variables.
+- Seen: workspace session 1, 2026-11
+- Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ## Verify and Done
 

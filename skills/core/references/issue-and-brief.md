@@ -66,6 +66,7 @@ Title: `<area or component>: <what to do>`, for example `ws: status shows open P
 One code block. Fill every field; a field you cannot fill means the issue is not ready.
 
 ```markdown
+User request for this task (verbatim): "<Nghiep's words>". Newer messages from Nghiep are handled by the orchestrator.
 Task: <repo>#<n>: <title>. Do ONLY this task.
 Goal: <1–2 sentences>
 Worktree: /home/nghiep/projects/nghiep-pham-ecosys/.tmp-session/wt/<session>-<lane> · Branch: <type>/<n>-<slug> from origin/main
