@@ -80,3 +80,6 @@ Rules: `agents/steering/data-rules.md`. Writing guide: `docs/standards/public-sa
 | Board items and their status | org GitHub Project "Ecosys board" (private) |
 | Post calendar and drafts | `projects/lab-to-prod` |
 | Profile facts `[P1]` | `private/vault/profile/profile.yaml` |
+| Research and reading notes, content ideas, messages between Claude Code and Claude Chat | Notion workspace (private; ids in `private/ops/notion.yaml`) |
+| Dashboard and project overview in Notion | a mirror of the rows above, written at session end (skill `session`); edit the source, not the mirror |
+| Calendar time blocks | Google Calendar; area mapping in `private/ops/plan/routine.yaml` |

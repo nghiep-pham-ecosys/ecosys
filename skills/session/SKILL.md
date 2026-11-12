@@ -82,7 +82,13 @@ checked facts, not from what the session remembers.
    `private/ops/memory.md`. Formats: [`references/log-and-memory.md`](references/log-and-memory.md).
 6. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`); the session's
    `.tmp-session` files deleted after their content is in the log. Commit `ops` changes through the normal flow.
-7. **Report** three lines to Nghiep, in Vietnamese: done / left and why / where the next session starts.
+7. **Mirror to Notion** (only when the Notion connector is present; otherwise say so and skip). Ids and what each
+   target holds: `private/ops/notion.yaml`. From the facts checked in step 2: replace the Dashboard callout on the
+   home page, update the Projects rows (Status, Focus, Open PRs, Last synced), and prepend one line to the inbox page
+   (`date · Claude Code · summary`). Read the inbox first: a line from Claude Chat is input for the next session.
+   Notion is a mirror: totals only for jobs, never company names, pay, contacts or anything not in a public-safe or
+   `ops` summary.
+8. **Report** three lines to Nghiep, in Vietnamese: done / left and why / where the next session starts.
 
 ## Maintenance
 
