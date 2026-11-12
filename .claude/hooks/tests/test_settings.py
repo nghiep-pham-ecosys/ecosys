@@ -40,6 +40,14 @@ class SettingsTest(unittest.TestCase):
         self.assertIn("mcp__plugin_github_github__merge_pull_request", deny)
         self.assertIn("Bash(gh pr merge*)", deny)
 
+    def test_only_the_merge_tool_is_pre_allowed_to_merge(self):
+        # The merge tool checks twice and refuses red PRs, so it is allowed without a prompt;
+        # raw merges stay denied and lanes are still blocked by ship-guard.
+        allow = self.settings["permissions"]["allow"]
+        self.assertIn("Bash(tools/ship/merge *)", allow)
+        self.assertIn("Bash(/usr/bin/python3 tools/ship/merge *)", allow)
+        self.assertFalse([a for a in allow if "gh pr merge" in a or "gh api" in a])
+
     def test_hook_scripts_exist(self):
         for script in ("ship-guard.py", "worktree-guard.py", "secret-path-guard.py"):
             self.assertTrue(os.path.isfile(os.path.join(HOOKS_DIR, script)), script)
