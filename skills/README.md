@@ -55,6 +55,10 @@ skills/lessons/lessons.md       ← public-safe lesson log
 - A lesson that repeats becomes a guard (`lessons` §4). When the guard is merged, shorten the skill text to one line
   that names the guard.
 - New skill: add it to the index above and to the "Which skill when" table in `core`.
-- After a skill changes, the next session reads the new version. Nothing else needs packaging.
+- After a skill changes, the next Claude Code session reads the new version from the repo. For Claude chat and
+  Desktop, which do not read the repo, run `just skills-zip` (all skills, or name some) and upload the changed
+  `dist/skills/<name>.zip` in Settings → Capabilities → Skills, replacing the old version. The zips are build output
+  and are not committed; `tools/skills/pack` checks the frontmatter (name = folder, description ≤ 1024 characters)
+  before writing anything.
 - Review the whole set at the first weekly review of each month: line counts, dead links, rules now covered by a
   guard, P1 skills that became due.
