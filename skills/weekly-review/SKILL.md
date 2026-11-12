@@ -64,7 +64,9 @@ the tool's name). Recurring work (daily posts, daily study) is one weekly item w
    priority. Show the sum per area against the budget, and the list of what does not fit.
 7. **Nghiep decides.** Apply his choices only: set items to `This week` and their `Week`, move the rest.
 8. **Write** `private/ops/reviews/YYYY-Www.md` with the template in
-   [`references/template.md`](references/template.md). Commit it to `ops` through the normal flow (`ship`).
+   [`references/template.md`](references/template.md). Commit it to `ops` through the normal flow (`ship`). Then, if
+   the Notion connector is present, add one row to the Weekly reviews database (ids in `private/ops/notion.yaml`):
+   Week, Week start, Planned h, Done h, Over budget, Decisions (one-line summary), Source = the ops file path.
 9. **Monthly:** the first review of each month also reviews the skill set (`skills/README.md` Maintenance) and the
    real numbers in `capacity.yaml`.
 
