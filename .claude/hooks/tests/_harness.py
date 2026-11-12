@@ -17,8 +17,11 @@ TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 HOOKS_DIR = os.path.dirname(TESTS_DIR)
 FIXTURES_DIR = os.path.join(TESTS_DIR, "fixtures")
 
-# The fixtures use these values; the hooks get them through the environment.
-PROJECT = "/home/nghiep/projects/nghiep-pham-ecosys"
+# The fixtures were captured with the project at FIXTURE_PROJECT. Tests run against the
+# real checkout (a CI runner clones elsewhere), so fixture paths are rewritten to PROJECT;
+# the hooks get it through the environment. Locally the two are the same path.
+FIXTURE_PROJECT = "/home/nghiep/projects/nghiep-pham-ecosys"
+PROJECT = os.path.realpath(os.path.join(HOOKS_DIR, "..", ".."))
 HOME = "/home/nghiep"
 WT = PROJECT + "/.tmp-session/wt"
 LANE = WT + "/s1-lane-a"
@@ -42,9 +45,22 @@ if HOOKS_DIR not in sys.path:
 def load_fixture(key: str) -> dict:
     name, overrides = FIXTURES[key]
     with open(os.path.join(FIXTURES_DIR, name), encoding="utf-8") as fh:
-        payload = json.load(fh)
+        payload = _rebase_paths(json.load(fh))
     payload.update(overrides)
     return payload
+
+
+def _rebase_paths(value):
+    """Point fixture paths captured under FIXTURE_PROJECT at the real checkout."""
+    if isinstance(value, str):
+        if value == FIXTURE_PROJECT or value.startswith(FIXTURE_PROJECT + "/"):
+            return PROJECT + value[len(FIXTURE_PROJECT):]
+        return value
+    if isinstance(value, dict):
+        return {k: _rebase_paths(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_rebase_paths(v) for v in value]
+    return value
 
 
 def build_payload(key: str, command: str | None = None, tool_input: dict | None = None,
