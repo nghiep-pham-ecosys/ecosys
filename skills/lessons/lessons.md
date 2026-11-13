@@ -44,8 +44,8 @@ _No entries yet._
   exit code of a two-step command.
 - How: after FAILED, run `gh pr view <n> --json state,mergeCommit` before any retry. Fix candidate: the tool
   re-reads the PR state after a non-zero exit and reports MERGED when it is merged.
-- Seen: ecosys#20, 2026-11-13
-- Guard: none yet (candidate: re-read in tools/ship/merge)
+- Seen: ecosys#20 and ecosys#23, 2026-11-13
+- Guard: tools/ship/merge re-reads the PR state after a non-zero gh exit (test_merge_error_after_successful_merge_is_merged)
 
 ### In a PR stack, retarget the next PR to main before merging the one below it
 - Why: merging a stacked PR with branch deletion closed the PR that was based on that branch (GitHub closes, it does
