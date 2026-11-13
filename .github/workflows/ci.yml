@@ -52,7 +52,7 @@ jobs:
       - name: Run tool tests
         run: |
           status=0
-          for dir in tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests; do
+          for dir in tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests tools/board/tests; do
             echo "::group::${dir}"
             if [ ! -d "${dir}" ]; then
               echo "::error::missing test directory ${dir}"

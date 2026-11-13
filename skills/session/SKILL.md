@@ -74,8 +74,8 @@ proposed items.
 
 ## End (spec §9.3)
 
-Order matters: **settle → check reality → lessons → drafts → write → clean → report**. The log is written last, from
-checked facts, not from what the session remembers.
+Order matters: **settle → check reality → lessons → drafts → board → write → clean → Notion → report**.
+The log is written last, from checked facts, not from what the session remembers.
 
 1. **Settle board items.** Verified → `Done` with an `Evidence` link (`ship` §5). Partly done → stays `In progress`
    with what is left and what blocks it. Dropped → `Dropped` with a reason.
@@ -85,18 +85,20 @@ checked facts, not from what the session remembers.
    `private/ops/lessons.md` (personal). A repeat becomes a guard (`lessons` §4).
 4. **Drafts.** Show every external draft verbatim, once, for approval. Nothing goes out without it. Record in the log
    what was approved and sent, and what is still waiting.
-5. **Write** the session log `private/ops/sessions/YYYY-MM-DD-<slug>.md` and **prepend** the memory block to
+5. **Board snapshot.** Run `just board-export` (writes `private/ops/plan/board.md`, first line `snapshot: <time>`)
+   so Claude Chat, which cannot read GitHub Projects, sees the board. It is committed with the session log.
+6. **Write** the session log `private/ops/sessions/YYYY-MM-DD-<slug>.md` and **prepend** the memory block to
    `private/ops/memory.md`. Formats: [`references/log-and-memory.md`](references/log-and-memory.md).
-6. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`); the session's
+7. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`); the session's
    `.tmp-session` files deleted after their content is in the log. Commit `ops` changes through the normal flow.
-7. **Mirror to Notion** (only when the Notion connector is present; otherwise say so and skip). Ids and what each
+8. **Mirror to Notion** (only when the Notion connector is present; otherwise say so and skip). Ids and what each
    target holds: `private/ops/notion.yaml`. From the facts checked in step 2: replace the Dashboard callout on the
    home page, update the Projects rows (Status, Focus, Open PRs, Last synced), and prepend one line to the top of the
    inbox page: `<YYYY-MM-DD> · CC · Xong: ... / Dở: ... / Cần anh: ...`, with the issue or PR link for each item.
    Read the inbox first: a line from Claude Chat is input for the next session.
    Notion is a mirror: totals only for jobs, never company names, pay, contacts or anything not in a public-safe or
    `ops` summary.
-8. **Report** three lines to Nghiep, in Vietnamese: done / left and why / where the next session starts.
+9. **Report** three lines to Nghiep, in Vietnamese: done / left and why / where the next session starts.
 
 ## Maintenance
 
