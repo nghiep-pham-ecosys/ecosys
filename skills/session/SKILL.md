@@ -10,6 +10,13 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
 
 ## Start (spec §9.2)
 
+0. **Read today's plan from the Notion inbox first**, before anything else. The page id is `inbox` in
+   `private/ops/notion.yaml` (section "Hộp thư", newest line first). Find the newest line of the form
+   `<today YYYY-MM-DD> · Chat · Hôm nay CC: ...`. It is the list of work Nghiep agreed with Claude Chat for Claude
+   Code today: step 5 proposes only items inside it. Steps 1–4 still run (ws-status, red runs, open PRs, drift), and
+   anything urgent they find is reported, not silently added. No line for today → tell Nghiep to run
+   "bắt đầu ngày làm việc" in Claude Chat first. No Notion connector in this client → say so and fall back to step 5
+   as written.
 1. **Read what was recorded.**
    - The newest block of `private/ops/memory.md` (only the newest; older blocks only when history is needed).
    - The newest session log in `private/ops/sessions/`.
@@ -26,7 +33,7 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
 3. **Report drift** between the records and reality before doing anything else: a PR that memory calls open but is
    merged, a repo on a branch nobody named, a deadline that moved.
 4. **Read lessons** for the areas about to be touched (`lessons` §1).
-5. **Propose 3–5 items within the area budgets** (`private/ops/plan/capacity.yaml`, WIP limits). For each: what, why,
+5. **Propose 3–5 items within today's inbox list (step 0) and the area budgets** (`private/ops/plan/capacity.yaml`, WIP limits). For each: what, why,
    how it will be verified. Unfinished `In progress` items come before new ones: close with evidence, finish, or
    record what blocks them. Items with a hard deadline come first.
 6. **After Nghiep agrees:** create `.tmp-session/checklist.md` and start.
@@ -84,8 +91,9 @@ checked facts, not from what the session remembers.
    `.tmp-session` files deleted after their content is in the log. Commit `ops` changes through the normal flow.
 7. **Mirror to Notion** (only when the Notion connector is present; otherwise say so and skip). Ids and what each
    target holds: `private/ops/notion.yaml`. From the facts checked in step 2: replace the Dashboard callout on the
-   home page, update the Projects rows (Status, Focus, Open PRs, Last synced), and prepend one line to the inbox page
-   (`date · Claude Code · summary`). Read the inbox first: a line from Claude Chat is input for the next session.
+   home page, update the Projects rows (Status, Focus, Open PRs, Last synced), and prepend one line to the top of the
+   inbox page: `<YYYY-MM-DD> · CC · Xong: ... / Dở: ... / Cần anh: ...`, with the issue or PR link for each item.
+   Read the inbox first: a line from Claude Chat is input for the next session.
    Notion is a mirror: totals only for jobs, never company names, pay, contacts or anything not in a public-safe or
    `ops` summary.
 8. **Report** three lines to Nghiep, in Vietnamese: done / left and why / where the next session starts.
