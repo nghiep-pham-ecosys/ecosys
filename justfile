@@ -10,7 +10,7 @@ set tempdir := ".tmp-session/just"
 # python3 on PATH that can import yaml, then fall back to the system one.
 python := `for p in python3 /usr/bin/python3; do if command -v "$p" >/dev/null 2>&1 && "$p" -c 'import yaml' 2>/dev/null; then command -v "$p"; exit 0; fi; done; echo python3`
 
-test_dirs := ".claude/hooks/tests tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests"
+test_dirs := ".claude/hooks/tests tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests tools/board/tests"
 
 # List the recipes
 default:
@@ -31,6 +31,10 @@ ws-workspace *args:
 # Job pipeline checks on the private ops data, plus skipped.yaml when present (args: --today YYYY-MM-DD, --close-after-days N)
 jobs-check *args:
     @skipped=(); if [ -f private/ops/jobs/skipped.yaml ]; then skipped=(--skipped private/ops/jobs/skipped.yaml); fi; {{python}} tools/jobs/check --data private/ops/jobs/applications.yaml "${skipped[@]}" "$@"
+
+# Snapshot the org board into private/ops/plan/board.md (args: --stdout, --out PATH)
+board-export *args:
+    @{{python}} tools/board/export "$@"
 
 # Zip each skill into dist/skills/<name>.zip for upload to Claude (args: skill names, default all)
 skills-zip *args:

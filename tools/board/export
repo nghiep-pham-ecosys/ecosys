@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Export the org board (GitHub Project) to a Markdown snapshot.
+
+Usage:
+  tools/board/export [--out PATH] [--input JSON] [--project N] [--owner ORG] [--stdout]
+
+Reads items with `gh project item-list <N> --owner <ORG> --format json`, or from --input (a saved
+JSON file, for tests and offline use), and writes private/ops/plan/board.md by default.
+The first line is `snapshot: <ISO time, +07:00>`. The board stays the source of truth.
+Exit codes: 0 ok, 1 gh or input error, 2 bad arguments.
+"""
+
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import _boardlib as bl  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_OUT = ROOT / "private" / "ops" / "plan" / "board.md"
+TZ = dt.timezone(dt.timedelta(hours=7))
+
+
+def _load(args: argparse.Namespace) -> list[dict]:
+    if args.input:
+        data = json.loads(Path(args.input).read_text(encoding="utf-8"))
+    else:
+        cmd = ["gh", "project", "item-list", str(args.project), "--owner", args.owner,
+               "--format", "json", "--limit", "1000"]
+        proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+        if proc.returncode != 0:
+            raise RuntimeError(f"gh failed ({proc.returncode}): {proc.stderr.strip()}")
+        data = json.loads(proc.stdout)
+    items = data.get("items") if isinstance(data, dict) else data
+    if not isinstance(items, list):
+        raise RuntimeError("input has no 'items' list")
+    total = data.get("totalCount") if isinstance(data, dict) else None
+    if isinstance(total, int) and total > len(items):
+        raise RuntimeError(f"only {len(items)} of {total} items returned; raise --limit")
+    return items
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--out", type=Path, default=DEFAULT_OUT)
+    parser.add_argument("--input", help="saved `gh project item-list --format json` output")
+    parser.add_argument("--project", type=int, default=1)
+    parser.add_argument("--owner", default="nghiep-pham-ecosys")
+    parser.add_argument("--stdout", action="store_true", help="print instead of writing --out")
+    args = parser.parse_args(argv)
+
+    try:
+        items = _load(args)
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"board export: {exc}", file=sys.stderr)
+        return 1
+
+    url = f"https://github.com/orgs/{args.owner}/projects/{args.project}"
+    text = bl.render(items, dt.datetime.now(TZ), project_url=url)
+    if args.stdout:
+        sys.stdout.write(text)
+        return 0
+    if not args.out.parent.is_dir():
+        print(f"board export: folder {args.out.parent} does not exist", file=sys.stderr)
+        return 1
+    args.out.write_text(text, encoding="utf-8")
+    print(f"board export: {len(items)} items -> {args.out}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
