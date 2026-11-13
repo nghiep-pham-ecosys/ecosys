@@ -76,6 +76,32 @@ _No entries yet._
 - Seen: 2026-11-13
 - Guard: lab-to-prod `publish/record_manual.py` + CLAUDE.md rule (lab-to-prod#13)
 
+### Keep bot-written state off a protected branch
+- Why: the publish and metrics workflows pushed `published.json` and `metrics.csv` straight to `main`, but the main
+  ruleset only accepts pull requests; a live run would have posted, failed to record it, and posted again on the
+  next run → the state store was the one branch bots may not write.
+- How: keep bot state on its own unprotected branch (`publish-state`), merge it into the checkout before a run, push
+  it back after. Readers that need the full record read that branch.
+- Seen: lab-to-prod, 2026-11-13 (caught before going live)
+- Guard: lab-to-prod `tools/state_sync.py` with tests (lab-to-prod#21)
+
+### Send your own User-Agent from token and API scripts
+- Why: dev.to answered 403 with an empty body to a valid key, because it blocks the default `Python-urllib` agent
+  → the error looked like a bad key.
+- How: set a named User-Agent in every stdlib HTTP helper; test a public endpoint with and without it before
+  blaming the credential.
+- Seen: lab-to-prod token scripts, 2026-11-13
+- Guard: `scripts/tokens/_common.py` USER_AGENT + test (lab-to-prod#25)
+
+### On use-case based developer apps, add each permission to the use case
+- Why: the Meta app was created with the "Manage everything on your Page" use case, but only `pages_show_list` was
+  enabled, so sign-in failed with "Invalid Scopes" → the newer app model grants nothing a script asks for unless the
+  use case lists it.
+- How: after creating an app, open the use case's permissions and add every scope the script requests; check the
+  settings page notes (localhost redirects need no entry in development mode).
+- Seen: Meta app for the Facebook Page, 2026-11-13
+- Guard: lab-to-prod docs/setup.md step 4 (lab-to-prod#17)
+
 ## Public-safe and privacy
 
 ### A public file must not list the names it is meant to hide

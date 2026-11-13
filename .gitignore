@@ -26,3 +26,4 @@ __pycache__/
 
 # Build output (tools/skills/pack writes dist/skills/*.zip)
 dist/
+secret_manager/
