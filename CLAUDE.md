@@ -13,6 +13,8 @@ This file replaces the global day-job rules for every session opened in this wor
 
 - No AWS commands, no day-job accounts, profiles or trackers.
 - No `handoff.md`. Session state lives in `private/ops` (memory block and session log, skill `session`).
+- Claude Chat ↔ Claude Code talk only through the Notion inbox page (`inbox` in `private/ops/notion.yaml`): read
+  today's `Chat` line at session start, prepend a `CC` line at session end (skill `session`, Start step 0 and End step 7).
 - Issue refs are `<repo>#<n>` (for example `Refs ecosys#12`). Day-job issue keys never appear here.
 - Only the ways of working carry over from the day job (spec §10.3). Nothing else does.
 
