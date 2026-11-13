@@ -81,8 +81,9 @@ The log is written last, from checked facts, not from what the session remembers
    with what is left and what blocks it. Dropped → `Dropped` with a reason.
 2. **Check reality.** `just ws-status`, last run on each touched repo's `main`, open PRs. Every number in the log and
    memory comes from this step. A mismatch with what the session believed is fixed or written down as drift.
-3. **Lessons.** Move `.tmp-session/lessons-pending.md` into `skills/lessons/lessons.md` (public-safe) or
-   `private/ops/lessons.md` (personal). A repeat becomes a guard (`lessons` §4).
+3. **Lessons.** Read the whole of `.tmp-session/lessons-pending.md` (earlier sessions may have left entries), then
+   move every entry into `skills/lessons/lessons.md` (public-safe) or `private/ops/lessons.md` (personal). A repeat
+   becomes a guard (`lessons` §4).
 4. **Drafts.** Show every external draft verbatim, once, for approval. Nothing goes out without it. Record in the log
    what was approved and sent, and what is still waiting.
 5. **Board snapshot.** Run `just board-export` (writes `private/ops/plan/board.md`, first line `snapshot: <time>`)

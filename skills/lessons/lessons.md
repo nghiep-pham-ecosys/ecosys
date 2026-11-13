@@ -38,6 +38,15 @@ _No entries yet._
 - Seen: ops, 2026-11-13
 - Guard: rule in skills/ship §3 (private repos)
 
+### A FAILED verdict from the merge tool is not proof the PR is unmerged
+- Why: with `delete_branch_on_merge` on, `gh pr merge --delete-branch` raced GitHub's own branch delete; the squash
+  merge went through but gh exited 1 on the 404 delete, so `tools/ship/merge` printed FAILED → the tool trusted the
+  exit code of a two-step command.
+- How: after FAILED, run `gh pr view <n> --json state,mergeCommit` before any retry. Fix candidate: the tool
+  re-reads the PR state after a non-zero exit and reports MERGED when it is merged.
+- Seen: ecosys#20, 2026-11-13
+- Guard: none yet (candidate: re-read in tools/ship/merge)
+
 ### In a PR stack, retarget the next PR to main before merging the one below it
 - Why: merging a stacked PR with branch deletion closed the PR that was based on that branch (GitHub closes, it does
   not retarget, when the base branch disappears) → the merge step deleted the base before the dependent PR moved.
@@ -68,5 +77,12 @@ _No entries yet._
 - Guard: hook pre-push denylist scan (local denylist, never committed) + ci hash-only check in public repos (spec §10.2)
 
 ## Data and tools
+
+### Read a scratch file before deleting it
+- Why: `.tmp-session/lessons-pending.md` was deleted after one entry was moved, without reading it first; any entry
+  an earlier session left there would be lost → the delete assumed the file held only what this session wrote.
+- How: `cat` the file, move every entry, then delete. The same holds for `checklist.md` and `drafts.md`.
+- Seen: 2026-11-13
+- Guard: ritual step (session End step 3)
 
 _No entries yet._
