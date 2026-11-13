@@ -7,7 +7,8 @@
     { "name": "lab-to-prod", "path": "projects/lab-to-prod" },
     { "name": "claude-for-everyone-vi", "path": "projects/claude-for-everyone-vi" },
     { "name": "physic-ai-for-everyone", "path": "projects/physic-ai-for-everyone" },
-    { "name": "nghiep-motion-studio", "path": "projects/nghiep-motion-studio" }
+    { "name": "nghiep-motion-studio", "path": "projects/nghiep-motion-studio" },
+    { "name": "process-sim-lab", "path": "projects/process-sim-lab" }
   ],
   "settings": {
     "files.exclude": {
