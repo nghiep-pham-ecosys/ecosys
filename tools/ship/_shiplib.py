@@ -325,22 +325,34 @@ def merge(
         return EXIT_OK
 
     proc = runner(cmd)
+    failure = ""
     if proc.returncode != 0:
         msg = (proc.stderr or proc.stdout or "").strip()
-        verdict("FAILED", target, f"gh pr merge exited {proc.returncode}: {msg}")
-        return EXIT_MERGE_FAILED
+        failure = f"gh pr merge exited {proc.returncode}: {msg}"
 
+    # Always re-read the PR: gh can exit non-zero after a successful merge, for
+    # example when the repo already deleted the branch (delete_branch_on_merge)
+    # and gh's own --delete-branch call then gets a 404.
     try:
         after = _gh_json(
             runner,
             ["pr", "view", str(number), "--repo", repo, "--json", "state,mergeCommit"],
         )
     except GhError as exc:
-        verdict("UNCONFIRMED", target, f"merge ran but the follow-up read failed: {exc}")
+        if failure:
+            verdict("FAILED", target, f"{failure}; the follow-up read failed too: {exc}")
+        else:
+            verdict("UNCONFIRMED", target, f"merge ran but the follow-up read failed: {exc}")
         return EXIT_MERGE_FAILED
     if str(after.get("state") or "").upper() != "MERGED":
-        verdict("UNCONFIRMED", target, f"merge ran but PR state is {after.get('state')!r}")
+        if failure:
+            verdict("FAILED", target, failure)
+        else:
+            verdict("UNCONFIRMED", target, f"merge ran but PR state is {after.get('state')!r}")
         return EXIT_MERGE_FAILED
     commit = (after.get("mergeCommit") or {}).get("oid") or "?"
-    verdict("MERGED", target, f"squashed head {first.sha[:7]} as {commit[:7]}")
+    detail = f"squashed head {first.sha[:7]} as {commit[:7]}"
+    if failure:
+        detail += f" (gh reported an error after the merge, ignored: {failure})"
+    verdict("MERGED", target, detail)
     return EXIT_OK

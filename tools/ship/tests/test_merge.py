@@ -267,10 +267,19 @@ class MergeTest(unittest.TestCase):
     # --- errors -----------------------------------------------------------
 
     def test_merge_command_failure(self):
-        gh = FakeGh([pr()], merge_rc=1)
+        gh = FakeGh([pr()], merge_rc=1, after_state="OPEN")
         code, _, _, text = self.go([], gh=gh)
         self.assertEqual(code, lib.EXIT_MERGE_FAILED)
         self.assertIn("VERDICT: FAILED", text)
+        self.assertIn("head mismatch", text)
+
+    def test_merge_error_after_successful_merge_is_merged(self):
+        # gh exits 1 when its branch delete races the repo's auto-delete, but the PR is merged.
+        gh = FakeGh([pr()], merge_rc=1, after_state="MERGED")
+        code, _, _, text = self.go([], gh=gh)
+        self.assertEqual(code, lib.EXIT_OK, text)
+        self.assertIn("VERDICT: MERGED acme/demo#7", text)
+        self.assertIn("ignored", text)
 
     def test_merge_not_confirmed(self):
         gh = FakeGh([pr()], after_state="OPEN")
