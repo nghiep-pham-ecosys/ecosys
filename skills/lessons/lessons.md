@@ -19,7 +19,7 @@ to `guards.md` in the same PR.
   the next `git push` as a lane push and blocked it → the shell cwd persists between tool calls.
 - How: commit inside the worktree, then `cd` back to the workspace root in its own call before pushing or merging.
   Write worktree paths literally; worktree-guard rejects paths built from shell variables.
-- Seen: workspace session 1, 2026-11
+- Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ## Verify and Done
@@ -27,6 +27,16 @@ to `guards.md` in the same PR.
 _No entries yet._
 
 ## Shipping and CI
+
+### A private repo needs its own CI before the merge tool can ship it
+- Why: `ops` had no workflow, so every PR had zero checks and `tools/ship/merge` refused it, even with
+  `--require ''`; two PRs sat open and older commits had gone straight to `main` → the private-repo rule assumed
+  checks existed but no step created them.
+- How: before the first PR in a private repo, add a workflow with jobs named `ci-result` and `pr-title` (copy
+  `ops/.github/workflows`). A PR opened before that needs its branch updated
+  (`gh api -X PUT repos/<o>/<r>/pulls/<n>/update-branch`) so the checks run.
+- Seen: ops, 2026-11-13
+- Guard: rule in skills/ship §3 (private repos)
 
 ### In a PR stack, retarget the next PR to main before merging the one below it
 - Why: merging a stacked PR with branch deletion closed the PR that was based on that branch (GitHub closes, it does
