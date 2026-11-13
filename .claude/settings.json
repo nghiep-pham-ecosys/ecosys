@@ -2,8 +2,9 @@
   "permissions": {
     "allow": ["Bash(just *)", "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git add *)",
               "Bash(git commit *)", "Bash(gh pr view*)", "Bash(gh pr checks*)", "Bash(gh repo list*)",
-              "Bash(tools/ship/merge *)", "Bash(/usr/bin/python3 tools/ship/merge *)"],
-    "ask":   ["Bash(git push*)", "Bash(gh workflow run*)", "Bash(gh api -X POST*)", "Bash(gh repo create*)"],
+              "Bash(tools/ship/merge *)", "Bash(/usr/bin/python3 tools/ship/merge *)",
+              "Bash(/home/nghiep/projects/nghiep-pham-ecosys/tools/ship/merge *)", "Bash(git push *)"],
+    "ask":   ["Bash(gh workflow run*)", "Bash(gh api -X POST*)", "Bash(gh repo create*)"],
     "deny":  ["Read(./.env)", "Read(./.env.*)", "Read(**/*.pem)", "Read(**/*.key)", "Read(~/.config/sops/**)",
               "Bash(gh pr merge*)", "Bash(sops -d*)", "Bash(age -d*)", "Bash(gh repo delete*)",
               "mcp__plugin_github_github__merge_pull_request"]
