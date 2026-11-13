@@ -15,3 +15,4 @@ repos:
   - { name: claude-for-everyone-vi, path: projects/claude-for-everyone-vi,   visibility: private, area: learn,   default_branch: main }
   - { name: physic-ai-for-everyone, path: projects/physic-ai-for-everyone,   visibility: private, area: lab,     default_branch: main }
   - { name: nghiep-motion-studio,   path: projects/nghiep-motion-studio,     visibility: public,  area: lab,     default_branch: main }
+  - { name: process-sim-lab,        path: projects/process-sim-lab,          visibility: public,  area: lab,     default_branch: main }

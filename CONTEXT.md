@@ -33,6 +33,7 @@ merge it, and `just ws-workspace` writes a gitignored local VS Code workspace th
 | `claude-for-everyone-vi` | private | `projects/claude-for-everyone-vi` | learn | learning material project |
 | `physic-ai-for-everyone` | private | `projects/physic-ai-for-everyone` | lab | Physical AI side project |
 | `nghiep-motion-studio` | public | `projects/nghiep-motion-studio` | lab | motion studio side project |
+| `process-sim-lab` | public | `projects/process-sim-lab` | lab | chemical process and equipment simulation with an agent interface |
 
 Not part of this workspace: other folders under `~/projects`, forks of third-party repos, and anything owned by an employer or client.
 
