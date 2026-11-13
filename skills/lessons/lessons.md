@@ -65,6 +65,17 @@ _No entries yet._
 - Seen: lab-to-prod recreation, 2026-11
 - Guard: ritual step in docs/runbooks/new-project.md
 
+## Publishing
+
+### Check the live profile and the publish record before any manual post
+- Why: two posts were made by hand in the browser, but the scheduling tool and the study log still said "waiting
+  for approval", so the next session almost posted one of them again → the only record of "posted" was a tool that
+  never saw the manual post.
+- How: before posting by hand, open the live profile and run `python -m publish.record_manual check` in
+  lab-to-prod; right after, run `record` with the live URL. Reports read `published.json` before saying "waiting".
+- Seen: 2026-11-13
+- Guard: lab-to-prod `publish/record_manual.py` + CLAUDE.md rule (lab-to-prod#13)
+
 ## Public-safe and privacy
 
 ### A public file must not list the names it is meant to hide
