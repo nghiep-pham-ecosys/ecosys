@@ -66,6 +66,8 @@ force push, no deletion.
 
 - the committed pre-push hook (`.githooks/pre-push`, enabled with `git config core.hooksPath .githooks`) that runs
   gitleaks. Check `git -C <repo> config core.hooksPath` prints `.githooks` before the first push. No hook → no push.
+- a CI workflow with jobs `ci-result` and `pr-title` (copy `ops/.github/workflows`). The merge tool refuses a PR
+  with no checks at all.
 - the same PR flow and `tools/ship/merge` as public repos. Direct pushes to `main` are not used, even though GitHub
   would allow them.
 
