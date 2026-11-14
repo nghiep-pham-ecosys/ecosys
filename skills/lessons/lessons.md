@@ -37,6 +37,14 @@ _No entries yet._
   (`gh api -X PUT repos/<o>/<r>/pulls/<n>/update-branch`) so the checks run.
 - Seen: ops, 2026-11-13
 - Guard: rule in skills/ship §3 (private repos)
+### `just ci` in a child-repo worktree may run the root recipe
+- Why: `ops` has no `justfile`. Its worktree sat under `.tmp-session/wt/` inside the root repo, so `just` searched
+  upward and ran the root `ci` recipe; a PR body then claimed a local check for `ops` that never ran → the evidence
+  named a command without checking which repo it belonged to.
+- How: before citing `just ci`, check that `<repo>/justfile` exists. Without one, cite the PR's CI checks and any
+  script you ran by name.
+- Seen: ops#26, 2026-11-15
+- Guard: none yet (candidate: an `ops` justfile with a `ci` recipe)
 
 ### A FAILED verdict from the merge tool is not proof the PR is unmerged
 - Why: with `delete_branch_on_merge` on, `gh pr merge --delete-branch` raced GitHub's own branch delete; the squash
