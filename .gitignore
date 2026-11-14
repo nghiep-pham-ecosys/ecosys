@@ -27,3 +27,13 @@ __pycache__/
 # Build output (tools/skills/pack writes dist/skills/*.zip)
 dist/
 secret_manager/
+
+# Personal voice / face / source media: never commit
+assets/self/
+
+# Local-only folders (ecosys#29): app worktrees, local MCP client config,
+# private research drafts and their harvest list (they live in private repos)
+.claude/worktrees/
+.kiro/settings/
+docs/research/
+inbox/
