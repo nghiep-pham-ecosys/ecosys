@@ -77,7 +77,9 @@ proposed items.
 Order matters: **settle → check reality → lessons → drafts → board → write → clean → Notion → report**.
 The log is written last, from checked facts, not from what the session remembers.
 
-1. **Settle board items.** Verified → `Done` with an `Evidence` link (`ship` §5). Partly done → stays `In progress`
+1. **Settle board items.** First merge every PR this session opened (`ship` §3, "When to merge"). A PR that cannot
+   merge stays open with its blocker under "Dở" in the log and the Notion line; it waits for the Sunday 19:30 review.
+   Verified → `Done` with an `Evidence` link (`ship` §5). Partly done → stays `In progress`
    with what is left and what blocks it. Dropped → `Dropped` with a reason.
 2. **Check reality.** `just ws-status`, last run on each touched repo's `main`, open PRs. Every number in the log and
    memory comes from this step. A mismatch with what the session believed is fixed or written down as drift.

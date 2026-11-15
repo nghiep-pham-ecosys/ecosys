@@ -58,6 +58,15 @@ Only through `tools/ship/merge` (raw `gh pr merge` is denied in settings and blo
 - merges with `--squash --match-head-commit <sha>`, so a push that lands during the check is never merged unchecked.
 
 Run `tools/ship/merge --help` for its arguments. If it refuses, fix the cause; never work around it.
+A repo whose checks are not named `ci-result` and `pr-title` needs `--require <its check names>`.
+
+**When to merge (Nghiep, 2026-11-16).** A PR opened in a session with Nghiep (Claude Code or Claude Chat) is merged
+in that same session as soon as it is green. No PR is left open at the end of such a session. Cloud routines open PRs
+and never merge them. Routine PRs, and any PR a session could not merge (red, blocked, waiting on a decision), wait
+for the weekly review on Sunday at 19:30. There is no daily PR review block.
+
+**Push from the repo's own clone** (`git -C <repo> push -u origin <branch>`). The ship guard treats any command that
+runs inside, or `git -C`s into, `.tmp-session/wt/` as a lane call and blocks the push.
 
 **Public repos** have a ruleset on `main`: PR required, squash only, required checks `ci-result` and `pr-title`, no
 force push, no deletion.
