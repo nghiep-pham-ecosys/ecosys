@@ -14,6 +14,17 @@ to `guards.md` in the same PR.
 - Seen: workspace session 1 (brand lane), 2026-11
 - Guard: ritual step in the lane brief template (skills/core/references/issue-and-brief.md)
 
+### Check which Notion workspace a session reaches before the first Notion call
+- Why: at session start the inbox page returned 404 and no routines were listed → the client was signed into another
+  claude.ai account, and a claude.ai connector (and the routine list) follows that account; one Notion connection
+  reaches one workspace.
+- How: use the project MCP server `notion-ecosys`; call `notion-get-self` first and stop all Notion calls unless it
+  names the `workspace` in `private/ops/notion.yaml`. Before touching a routine, check that `RemoteTrigger list`
+  shows the routines in `ops/automations.md`.
+- Seen: ecosys#35, 2026-11-16
+- Guard: test .claude/hooks/tests/test_settings.py (keeps the `notion-ecosys` server); the workspace check itself is
+  session Start step 0 (ecosys#36)
+
 ### Leave a lane worktree before shipping from the main session
 - Why: after `cd` into a `.tmp-session/wt/` worktree, the main session's shell stayed there, so ship-guard treated
   the next `git push` as a lane push and blocked it → the shell cwd persists between tool calls.
@@ -21,7 +32,8 @@ to `guards.md` in the same PR.
   Write worktree paths literally; worktree-guard rejects paths built from shell variables.
   `git -C <worktree> push` is blocked the same way: push with `git -C <repo clone> push -u origin <branch>`.
 - Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path);
-  ops#30, 2026-11-16 (`git -C` into the worktree for the push)
+  ops#30, 2026-11-16 (`git -C` into the worktree for the push); ops#40, 2026-11-16 evening (a push in the same
+  command line as a worktree path, and `gh issue create` from a shell left in a worktree)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ## Verify and Done
@@ -140,6 +152,15 @@ _No entries yet._
 - Guard: hook pre-push denylist scan (local denylist, never committed) + ci hash-only check in public repos (spec §10.2)
 
 ## Data and tools
+
+### Commit with the GitHub noreply address in every workspace repo
+- Why: a privacy review found the personal e-mail as author on a PR commit → identity came from the global git
+  config; squash merges hide it on `main`, but PR commits stay readable on GitHub.
+- How: once per machine, `includeIf "gitdir:~/projects/nghiep-pham-ecosys/"` in `~/.gitconfig` points to a file
+  that sets `user.email` to the GitHub noreply address (`agents/steering/machine-notes.md`). Check with
+  `git config user.email` in any workspace repo before the first commit on a new machine.
+- Seen: ecosys PR #36, 2026-11-16 (earlier PRs too)
+- Guard: none: external machine git config, outside the repos
 
 ### Read a scratch file before deleting it
 - Why: `.tmp-session/lessons-pending.md` was deleted after one entry was moved, without reading it first; any entry

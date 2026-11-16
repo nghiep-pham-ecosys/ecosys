@@ -17,6 +17,9 @@
 - System `python3` is 3.12 with PyYAML 6.0.1. `pytest` is not assumed: tests use `unittest`.
 - A non-interactive shell (agent Bash tool, cron) may not load `~/.zshrc`. If `just` or `gitleaks` is not found, call `~/.local/bin/mise exec -- <cmd>` or use the absolute shim path.
 - `gh` is signed in as `pqnghiep1354`. Org admin calls need the `admin:org` scope; Project calls need `project`.
+- Git identity: `~/.gitconfig` has `includeIf "gitdir:~/projects/nghiep-pham-ecosys/"` → `~/.config/git/nghiep-pham-ecosys.gitconfig`,
+  which sets `user.email` to the GitHub noreply address for every workspace repo and worktree. Repos outside the
+  workspace keep the global address.
 
 ## MCP servers
 
