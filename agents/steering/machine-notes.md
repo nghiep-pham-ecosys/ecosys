@@ -18,6 +18,21 @@
 - A non-interactive shell (agent Bash tool, cron) may not load `~/.zshrc`. If `just` or `gitleaks` is not found, call `~/.local/bin/mise exec -- <cmd>` or use the absolute shim path.
 - `gh` is signed in as `pqnghiep1354`. Org admin calls need the `admin:org` scope; Project calls need `project`.
 
+## MCP servers
+
+- `.mcp.json` at the root defines one project server, `notion-ecosys` (hosted Notion MCP, OAuth). It is enabled in
+  `.claude/settings.json` (`enabledMcpjsonServers`), so Claude Code loads it only in this workspace.
+- Why not the claude.ai Notion connector: a connector belongs to the claude.ai account the client is signed into, and
+  one Notion connection reaches one workspace. The project server keeps its own OAuth token on this machine, so it
+  works whichever claude.ai account is signed in. Claude Code treats a connector with the same URL as a duplicate and
+  uses the project server.
+- First use on a machine: run `/mcp` → `notion-ecosys` → Authenticate, then pick the personal workspace (the name is
+  `workspace` in `private/ops/notion.yaml`) on the Notion consent page. Check with `notion-get-self`.
+- A Notion workspace for other work is never added here. Configure it in that project's own folder.
+- Limits: cloud routines do not read `.mcp.json`; they use the claude.ai connectors of the account that owns the
+  routine. Claude Chat on the web and Kiro keep their own Notion connections.
+- `.mcp.json` holds URLs only: no headers, tokens or env values (a settings test checks this).
+
 ## Commands
 
 - Prefer single-line commands. Long backslash-continued commands are fragile in WSL terminals and in agent tools.

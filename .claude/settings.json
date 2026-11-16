@@ -9,6 +9,7 @@
               "Bash(gh pr merge*)", "Bash(sops -d*)", "Bash(age -d*)", "Bash(gh repo delete*)",
               "mcp__plugin_github_github__merge_pull_request"]
   },
+  "enabledMcpjsonServers": ["notion-ecosys"],
   "hooks": {
     "PreToolUse": [
       { "matcher": "Bash", "hooks": [

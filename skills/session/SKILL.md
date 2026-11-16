@@ -10,13 +10,18 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
 
 ## Start (spec §9.2)
 
-0. **Read today's plan from the Notion inbox first**, before anything else. The page id is `inbox` in
-   `private/ops/notion.yaml` (section "Hộp thư", newest line first). Find the newest line of the form
-   `<today YYYY-MM-DD> · Chat · Hôm nay CC: ...`. It is the list of work Nghiep agreed with Claude Chat for Claude
-   Code today: step 5 proposes only items inside it. Steps 1–4 still run (ws-status, red runs, open PRs, drift), and
-   anything urgent they find is reported, not silently added. No line for today → tell Nghiep to run
-   "bắt đầu ngày làm việc" in Claude Chat first. No Notion connector in this client → say so and fall back to step 5
-   as written.
+0. **Read today's plan from the Notion inbox first**, before anything else. Use the project MCP server
+   `notion-ecosys` (tools `mcp__notion-ecosys__*`, set up in `.mcp.json`; see `agents/steering/machine-notes.md`),
+   not a claude.ai connector, which follows whichever claude.ai account the client is signed into.
+   - First call `notion-get-self`. The workspace name must be `workspace` in `private/ops/notion.yaml`. Another
+     workspace → stop all Notion calls (no search, no read, no write there), say so, and ask Nghiep to run `/mcp` →
+     `notion-ecosys` → Authenticate and pick the personal workspace. Server missing or not authenticated → the same.
+   - The page id is `inbox` in `private/ops/notion.yaml` (section "Hộp thư", newest line first). Find the newest line
+     of the form `<today YYYY-MM-DD> · Chat · Hôm nay CC: ...`. It is the list of work Nghiep agreed with Claude Chat
+     for Claude Code today: step 5 proposes only items inside it. Steps 1–4 still run (ws-status, red runs, open PRs,
+     drift), and anything urgent they find is reported, not silently added.
+   - No line for today → tell Nghiep to run "bắt đầu ngày làm việc" in Claude Chat first. No usable Notion server →
+     say so and fall back to step 5 as written.
 1. **Read what was recorded.**
    - The newest block of `private/ops/memory.md` (only the newest; older blocks only when history is needed).
    - The newest session log in `private/ops/sessions/`.
@@ -26,9 +31,10 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
    - `just ws-status`: branch, dirty count, ahead/behind, open PRs per repo.
    - Red runs: `gh run list -R <org>/<repo> --status failure --limit 5` for repos with recent activity.
    - Deadlines within 48 h: `private/ops/learn/deadlines.yaml`; job follow-ups and interviews: `just jobs-check`.
-   - Today's calendar: the Notion Calendar connector (`notion-calendar-list-events`, today 00:00–24:00,
+   - Today's calendar: Notion Calendar through `notion-ecosys` (`notion-calendar-list-events`, today 00:00–24:00,
      Asia/Ho_Chi_Minh) reads Nghiep's personal Google Calendar. Report the fixed blocks so the plan fits around them;
-     never copy event details into a public file. No connector in this client → say so and skip.
+     never copy event details into a public file. No usable `notion-ecosys` (missing, not authenticated, or step 0
+     found another workspace) → say so and skip.
    - Digest "red" items, once the digest exists **[P1]**.
 3. **Report drift** between the records and reality before doing anything else: a PR that memory calls open but is
    merged, a repo on a branch nobody named, a deadline that moved.
@@ -94,7 +100,8 @@ The log is written last, from checked facts, not from what the session remembers
    `private/ops/memory.md`. Formats: [`references/log-and-memory.md`](references/log-and-memory.md).
 7. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`); the session's
    `.tmp-session` files deleted after their content is in the log. Commit `ops` changes through the normal flow.
-8. **Mirror to Notion** (only when the Notion connector is present; otherwise say so and skip). Ids and what each
+8. **Mirror to Notion** through `notion-ecosys`, only after `notion-get-self` names the personal workspace (Start
+   step 0); otherwise say so and skip. Ids and what each
    target holds: `private/ops/notion.yaml`. From the facts checked in step 2: replace the Dashboard callout on the
    home page, update the Projects rows (Status, Focus, Open PRs, Last synced), and prepend one line to the top of the
    inbox page: `<YYYY-MM-DD> · CC · Xong: ... / Dở: ... / Cần anh: ...`, with the issue or PR link for each item.
