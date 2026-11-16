@@ -26,7 +26,7 @@ less. The draft does the counting so he only decides.
 | Content published vs planned | the lab-to-prod calendar and its published posts |
 | Automations | `private/ops/automations.md`; red runs: `gh run list --status failure` on repos with scheduled workflows |
 | Plan-limit hits, hours actually spent | the week's session logs `private/ops/sessions/*.md` |
-| Hours the calendar already commits per area | next week's events via the Notion Calendar connector, mapped to areas in `private/ops/plan/routine.yaml` (refresh the file when blocks changed) |
+| Hours the calendar already commits per area | next week's events via Notion Calendar (Claude Code: server `notion-ecosys`; Claude Chat: its Notion connector; either way only after `notion-get-self` names the `workspace` in `private/ops/notion.yaml`), mapped to areas in `private/ops/plan/routine.yaml` (refresh the file when blocks changed) |
 | Last week's decisions | the previous `private/ops/reviews/YYYY-Www.md` |
 
 Every number in the draft names its source. A number that could not be checked is marked *unverified*.
@@ -65,7 +65,8 @@ the tool's name). Recurring work (daily posts, daily study) is one weekly item w
 7. **Nghiep decides.** Apply his choices only: set items to `This week` and their `Week`, move the rest.
 8. **Write** `private/ops/reviews/YYYY-Www.md` with the template in
    [`references/template.md`](references/template.md). Commit it to `ops` through the normal flow (`ship`). Then, if
-   the Notion connector is present, add one row to the Weekly reviews database (ids in `private/ops/notion.yaml`):
+   Notion is reachable and `notion-get-self` names the `workspace` in `private/ops/notion.yaml` (Claude Code: server
+   `notion-ecosys`; Claude Chat: its Notion connector), add one row to the Weekly reviews database (ids in `private/ops/notion.yaml`):
    Week, Week start, Planned h, Done h, Over budget, Decisions (one-line summary), Source = the ops file path.
 9. **Monthly:** the first review of each month also reviews the skill set (`skills/README.md` Maintenance) and the
    real numbers in `capacity.yaml`.

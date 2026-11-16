@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "notion-ecosys": {
+      "type": "http",
+      "url": "https://mcp.notion.com/mcp"
+    }
+  }
+}

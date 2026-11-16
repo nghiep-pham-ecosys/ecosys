@@ -48,6 +48,19 @@ class SettingsTest(unittest.TestCase):
         self.assertIn("Bash(/usr/bin/python3 tools/ship/merge *)", allow)
         self.assertFalse([a for a in allow if "gh pr merge" in a or "gh api" in a])
 
+    def test_project_mcp_servers_are_enabled_urls_without_secrets(self):
+        # .mcp.json is public: each server is a plain https URL (OAuth tokens stay on the machine),
+        # and settings enable exactly the servers it defines, so no approval prompt and no stray server.
+        path = os.path.join(os.path.dirname(os.path.dirname(HOOKS_DIR)), ".mcp.json")
+        with open(path, encoding="utf-8") as fh:
+            servers = json.load(fh)["mcpServers"]
+        self.assertEqual(set(servers), {"notion-ecosys"})
+        for name, cfg in servers.items():
+            self.assertEqual(set(cfg), {"type", "url"}, name)
+            self.assertEqual(cfg["type"], "http", name)
+            self.assertTrue(cfg["url"].startswith("https://"), name)
+        self.assertEqual(set(self.settings.get("enabledMcpjsonServers", [])), set(servers))
+
     def test_hook_scripts_exist(self):
         for script in ("ship-guard.py", "worktree-guard.py", "secret-path-guard.py"):
             self.assertTrue(os.path.isfile(os.path.join(HOOKS_DIR, script)), script)
