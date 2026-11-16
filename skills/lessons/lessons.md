@@ -19,7 +19,9 @@ to `guards.md` in the same PR.
   the next `git push` as a lane push and blocked it → the shell cwd persists between tool calls.
 - How: commit inside the worktree, then `cd` back to the workspace root in its own call before pushing or merging.
   Write worktree paths literally; worktree-guard rejects paths built from shell variables.
-- Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path)
+  `git -C <worktree> push` is blocked the same way: push with `git -C <repo clone> push -u origin <branch>`.
+- Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path);
+  ops#30, 2026-11-16 (`git -C` into the worktree for the push)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ## Verify and Done
@@ -73,6 +75,14 @@ _No entries yet._
 - Seen: lab-to-prod recreation, 2026-11
 - Guard: ritual step in docs/runbooks/new-project.md
 
+### Rerun a workflow whose check stays pending after the run completed
+- Why: a gitleaks job still showed `in_progress` on the PR while its run was `completed` with `success`, so
+  `tools/ship/merge` kept waiting → GitHub did not refresh the job status on the check.
+- How: if `gh run view <id>` says completed but the check is still pending after 2 min, run `gh run rerun <id>`
+  and wait for the new run. Never merge around the tool.
+- Seen: ops#33, 2026-11-16
+- Guard: none: external GitHub check status not refreshed
+
 ## Publishing
 
 ### Check the live profile and the publish record before any manual post
@@ -110,6 +120,14 @@ _No entries yet._
 - Seen: Meta app for the Facebook Page, 2026-11-13
 - Guard: lab-to-prod docs/setup.md step 4 (lab-to-prod#17)
 
+### Give a time-critical scheduled workflow a second, idempotent cron
+- Why: on 2026-11-16 neither the 08:15 publish cron nor the 08:20 blog cron ran by 09:20; the post went out only
+  after a manual dispatch → the pipeline assumed GitHub's scheduler runs late at worst, but it can skip a run.
+- How: add a backup cron 30–45 min later that does nothing when the first run already published; check the
+  morning run at session start.
+- Seen: lab-to-prod#29, 2026-11-16
+- Guard: ci lab-to-prod publish.yml and blog.yml backup crons (lab-to-prod#29)
+
 ## Public-safe and privacy
 
 ### A public file must not list the names it is meant to hide
@@ -130,4 +148,9 @@ _No entries yet._
 - Seen: 2026-11-13
 - Guard: ritual step (session End step 3)
 
-_No entries yet._
+### Fetch before reading ahead/behind
+- Why: at session start `just ws-status` showed `ops` at +0/-0, but `origin/main` already had one more commit merged
+  the evening before → the status read local remote refs without fetching, so it reported an old snapshot.
+- How: run `just ws-sync` (or `git fetch`) before `just ws-status`, and say which one ran when reporting state.
+- Seen: ops, 2026-11-16
+- Guard: none: judgement until ws-status fetches itself (candidate change to tools/ws)
