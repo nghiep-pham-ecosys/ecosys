@@ -59,6 +59,6 @@ When a value is checked, move its row to the verified table with the date.
 
 ## Revisit when
 
-- The first paid API call is proposed (then ADR 0004: AI gateway with ledger and caps).
+- The first paid API call is proposed (then an ADR with the next free number: AI gateway with ledger and caps; 0004 went to the AI engineering lab).
 - A free-tier limit is hit, or a *(verify)* value turns out wrong.
 - Something must run more often than hourly (Cloudflare Workers cron).

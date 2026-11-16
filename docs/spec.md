@@ -302,7 +302,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 
 - **Usage budget:** Claude plan limits are the real constraint (limits were hit on 2026-11-12). Rules: heavy multi-file work goes in one planned session; scheduled tasks stay short and do one thing; subagents are used only for independent parallel lanes. The weekly review notes whether limits were hit and moves work if they were.
 - Free LLM tiers (for example a free Gemini tier) MAY be used **only on public or synthetic data**, because free tiers may train on inputs.
-- `[TRIGGER: the first paid API call]`: the AI gateway with a ledger and caps from v0.2 §4.10 comes back as ADR 0004.
+- `[TRIGGER: the first paid API call]`: the AI gateway with a ledger and caps from v0.2 §4.10 comes back as an ADR with the next free number (ADR 0004 is the AI engineering lab).
 
 ---
 
