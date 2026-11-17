@@ -43,7 +43,7 @@ Each rule names what enforces it.
 | Never read `.env*`, keys, sops files, `~/.config/sops/**` or the local denylist. | hook `secret-path-guard` |
 | No paid API or paid service without an explicit yes, with the monthly cost stated first (P5). | ADR 0003 |
 | Never submit an application, publish a post or send a message without Nghiep (P8). | ADR 0003 |
-| Personal data lives only in `private/ops` or `private/vault`. Everything else is public-safe. | denylist + pre-push hook |
+| Personal data lives only in `private/ops` or `private/vault`. Everything else is public-safe. | denylist + pre-push hook + hook `public-safe-guard` |
 | Nothing from the day job or clients except ways of working (spec §10.3). | denylist + reviewer-privacy |
 | Never state live status from memory. Check it, or label it *unverified*. | ritual |
 

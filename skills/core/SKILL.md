@@ -31,7 +31,7 @@ Each rule names what enforces it. A rule without a guard is a ritual step with a
 | 5 | Merge only through `tools/ship/merge`. | hook `ship-guard` + settings deny `gh pr merge` |
 | 6 | No paid API or paid service without an explicit yes, with the monthly cost stated first (P5). | ritual: ADR 0003 approvals |
 | 7 | Never submit an application, publish a post or send a message without Nghiep. Draft first; Nghiep approves. | ritual: `session` end step 3; `ship-guard` blocks lane writes |
-| 8 | Personal data lives only in `private/ops` or `private/vault`. Public repos follow the public-safe rule (§10.2). | local denylist pre-push hook, hash-only public CI; `public-safe-guard` **[P1]** |
+| 8 | Personal data lives only in `private/ops` or `private/vault`. Public repos follow the public-safe rule (§10.2). | local denylist pre-push hook, hash-only public CI; hook `public-safe-guard` |
 | 9 | Nothing from the day job or clients comes in except ways of working (§10.3). | denylist + reviewer-privacy pass |
 | 10 | Never state live status from memory. Check it live in the same turn, or label it *unverified*. | ritual: `session` start step 2 |
 | 11 | Never read secrets: `.env*`, keys, sops decryption, the denylist file. | hook `secret-path-guard` + settings deny |

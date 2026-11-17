@@ -35,6 +35,9 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(self.hook_matchers("ship-guard.py"), ["Bash", "Write|Edit|MultiEdit|NotebookEdit"])
         self.assertEqual(self.hook_matchers("worktree-guard.py"), ["Bash"])
 
+    def test_public_safe_guard_sees_writes_and_bash(self):
+        self.assertEqual(self.hook_matchers("public-safe-guard.py"), ["Write|Edit|MultiEdit|NotebookEdit|Bash"])
+
     def test_mcp_merge_is_denied(self):
         deny = self.settings["permissions"]["deny"]
         self.assertIn("mcp__plugin_github_github__merge_pull_request", deny)
@@ -62,7 +65,7 @@ class SettingsTest(unittest.TestCase):
         self.assertEqual(set(self.settings.get("enabledMcpjsonServers", [])), set(servers))
 
     def test_hook_scripts_exist(self):
-        for script in ("ship-guard.py", "worktree-guard.py", "secret-path-guard.py"):
+        for script in ("ship-guard.py", "worktree-guard.py", "secret-path-guard.py", "public-safe-guard.py"):
             self.assertTrue(os.path.isfile(os.path.join(HOOKS_DIR, script)), script)
 
 

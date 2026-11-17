@@ -35,7 +35,7 @@ A public file must not list the names it is meant to block. Lesson from lab-to-p
 ## Checks before a push
 
 1. `gitleaks` on the staged change (pre-push hook and CI).
-2. Denylist scan of the change (local pre-push hook; `public-safe-guard` `[P1]`).
+2. Denylist scan of the change (local pre-push hook). The hook `public-safe-guard` already blocks a denylisted term that an agent writes into a file, commit, PR or issue of a public repo.
 3. Read the diff once with the question "would this be fine on a stranger's screen?".
 4. A PR that touches `profile` text, posts or project READMEs gets a reviewer-privacy pass.
 

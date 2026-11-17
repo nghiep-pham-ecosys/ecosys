@@ -12,6 +12,7 @@ see and which controls catch it instead.
 | `ship-guard.py` | Bash, Write, Edit, MultiEdit, NotebookEdit | lanes: push in every form, `reset --hard`, `clean -f`, skipped hooks, git aliases, includes and injected git config, writes to git config and hooks, the merge tool, gh writes, computed command names and git subcommands, `xargs git/gh/sops/age`, unreadable text piped into a shell; everyone: `gh pr merge`, REST and GraphQL merges, `gh alias set/import`, writes to the gh config, computed gh subcommands, computed command names that could be git/gh/sops/age |
 | `worktree-guard.py` | Bash | `git worktree add/move` outside `.tmp-session/wt/` (also through a symlink, a same-line alias or `$PWD`) |
 | `secret-path-guard.py` | file tools, Bash | `.env*` (not `.env.example` or `*.sops.*`), `*.pem`/`*.key` and globs that can match them, `~/.config/sops/`, the local denylist, recursive readers started above those two folders, decryption (also behind a computed command name or in a command-valued environment variable), `xargs cat` of secret names |
+| `public-safe-guard.py` | Write, Edit, MultiEdit, NotebookEdit, Bash | a term from the local denylist going into a public repo (see [public-safe-guard](#public-safe-guard)) |
 
 Shared parsing lives in `_guardlib.py`. Tests: `python3 -m unittest discover -s tests -p 'test_*.py'`.
 
@@ -134,6 +135,35 @@ Shared parsing lives in `_guardlib.py`. Tests: `python3 -m unittest discover -s 
   (`cat`, `sed -n`, `ruff`, `mypy`, `shellcheck`, `python3 -m py_compile`, ...).
 - **git clone in lanes**: `-c`/`--config` values follow the lane config rules, and
   `--template`, `-u` and `--upload-pack` are blocked, also after `gh repo clone ... --`.
+
+## public-safe-guard
+
+`public-safe-guard.py` keeps the terms of the local denylist out of public repos (spec §10.2). It runs for
+everyone, main session and lanes.
+
+- **Denylist.** `~/.config/nghiep-pham-ecosys/denylist.txt`: one term per line, `#` starts a comment, matched as a case-insensitive
+  substring, as `tools/ws/denylist-scan` does. `PUBLIC_SAFE_GUARD_DENYLIST` names another file; the tests use it
+  with a synthetic list. A block names the file (each term masked as `***`) or the repo, never the term.
+- **Public repo.** The repo that holds the path, found from the nearest `.git`, is looked up by path in
+  `repos.yaml` (`visibility: public`). A lane worktree counts as the repo it was made from. Paths that git ignores
+  there (`.tmp-session/`, `dist/`, ...) are not public. Repos that are not in `repos.yaml` (the private overlay,
+  folders outside the workspace) are not checked.
+- **File tools.** Write `content`, Edit `new_string`, MultiEdit `edits[].new_string`, NotebookEdit `new_source`, and
+  the file name. Text that only leaves a file (`old_string`) is not checked.
+- **Bash.** Only when the command text holds a term. The command is blocked when it also writes a file in a public
+  repo (the write targets ship-guard reads: redirects, `tee`, `cp/mv/install/ln/rsync`, `sed -i`, `dd of=`; `rm` and
+  `chmod` add no text), runs `git commit`, `commit-tree`, `tag`, `notes` or `merge` in a public repo (`git -C` and a
+  literal `cd` are followed), or sends text to a public repo with gh (`pr`/`issue` create, edit, comment, review,
+  close; `release`/`label` create, edit; a write `gh api repos/<owner>/<repo>/...`; any GraphQL mutation).
+- **Open on a missing list, closed on a missing manifest.** A missing, unreadable or empty denylist allows the call
+  with a one-line notice on stderr (CI runners have no denylist). A missing or unreadable `repos.yaml` makes every
+  repo count as public.
+
+Limits: the whole command text is matched, so a term anywhere on a line that also commits or writes in a public repo
+blocks the line (split it). Text the hook cannot see gets through: `cp` or `mv` of a file whose content holds a term,
+`git commit -F file` or an editor message, `gh ... --body-file`, a term built by the shell (`"Ac""me"`), files
+written by a program the hook does not model (`python3 -c`). The pre-push denylist scan and `just denylist` are the
+backstops for those.
 
 ## Limits
 

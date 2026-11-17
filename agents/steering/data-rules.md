@@ -21,7 +21,7 @@ Public repos (`ecosys`, `.github`, `lab-to-prod`, public projects) never contain
 
 How to write around this: `docs/standards/public-safe-writing.md`.
 
-**Enforcement.** A local denylist at `~/.config/nghiep-pham-ecosys/denylist.txt` (never committed, chmod 600) feeds the pre-push hook and `public-safe-guard` `[P1]`. Public CI checks only hashes and generic patterns. Agents never read or print the denylist (hook `secret-path-guard`).
+**Enforcement.** A local denylist at `~/.config/nghiep-pham-ecosys/denylist.txt` (never committed, chmod 600) feeds the pre-push hook and the hook `public-safe-guard`. Public CI checks only hashes and generic patterns. Agents never read or print the denylist (hook `secret-path-guard`).
 
 Never list the names you want to hide in a public file. A public file that lists them defeats its purpose.
 

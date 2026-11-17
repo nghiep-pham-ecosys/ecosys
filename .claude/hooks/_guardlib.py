@@ -1728,6 +1728,43 @@ def is_redirect(tok: str) -> bool:
     return bool(REDIRECT_RE.match(tok))
 
 
+# Programs whose last plain argument (or -t value) is written, and programs
+# that write every plain argument. Used by ship-guard and public-safe-guard.
+COPY_LIKE = {"cp", "mv", "install", "ln", "rsync"}
+WRITE_ALL_ARGS = {"tee", "truncate", "chmod", "chown", "touch", "rm", "unlink", "shred"}
+
+
+def write_targets(info: dict) -> list:
+    """Paths a Bash command writes: redirect targets and writer arguments.
+
+    `info` is one item of command_infos(). The words are returned as they
+    stand (Word objects or text); callers expand them with expand_path().
+    """
+    raw = info["raw"]
+    targets = [raw[k + 1] for k, t in enumerate(raw[:-1]) if is_redirect(t) and ">" in str(t)]
+    cmd = info["core"]
+    if not cmd:
+        return targets
+    base = os.path.basename(str(cmd[0]))
+    args = [a for a in cmd[1:] if not is_redirect(a)]
+    plain = [a for a in args if not str(a).startswith("-")]
+    if base in WRITE_ALL_ARGS:
+        targets.extend(plain)
+    elif base in COPY_LIKE:
+        for k, a in enumerate(args):
+            if str(a) in ("-t", "--target-directory") and k + 1 < len(args):
+                targets.append(args[k + 1])
+            elif str(a).startswith("--target-directory="):
+                targets.append(str(a).split("=", 1)[1])
+        if plain:
+            targets.append(plain[-1])
+    elif base in ("sed", "perl") and any(str(a).startswith("-i") or str(a).startswith("--in-place") for a in args):
+        targets.extend(plain)
+    elif base == "dd":
+        targets.extend(str(a)[3:] for a in args if str(a).startswith("of="))
+    return targets
+
+
 # ---------------------------------------------------------------- dynamic command words
 
 SUSPECT_RE = re.compile(r"\bwhich\b|\bcommand\s+-[vV]\b|\btype\s+-[aPpt]|\bwhereis\b|\bhash\b|\bcompgen\b")

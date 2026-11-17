@@ -98,8 +98,6 @@ LANE_CONFIG_RULES = [
 ]
 CONFIG_VERBS = {"set", "get", "unset", "list", "edit", "rename-section", "remove-section", "get-color",
                 "get-colorbool", "get-regexp", "get-urlmatch", "get-all", "unset-all", "add", "replace-all"}
-COPY_LIKE = {"cp", "mv", "install", "ln", "rsync"}
-WRITE_ALL_ARGS = {"tee", "truncate", "chmod", "chown", "touch", "rm", "unlink", "shred"}
 
 # gh subcommands a lane may run (read-only or local-only).
 GH_LANE_ALLOW = {
@@ -587,33 +585,6 @@ def _protected_kind(path, home):
     return None
 
 
-def _write_targets(info):
-    """Paths a Bash command writes: redirect targets and writer arguments."""
-    raw = info["raw"]
-    targets = [raw[k + 1] for k, t in enumerate(raw[:-1]) if g.is_redirect(t) and ">" in str(t)]
-    cmd = info["core"]
-    if not cmd:
-        return targets
-    base = os.path.basename(str(cmd[0]))
-    args = [a for a in cmd[1:] if not g.is_redirect(a)]
-    plain = [a for a in args if not str(a).startswith("-")]
-    if base in WRITE_ALL_ARGS:
-        targets.extend(plain)
-    elif base in COPY_LIKE:
-        for k, a in enumerate(args):
-            if str(a) in ("-t", "--target-directory") and k + 1 < len(args):
-                targets.append(args[k + 1])
-            elif str(a).startswith("--target-directory="):
-                targets.append(str(a).split("=", 1)[1])
-        if plain:
-            targets.append(plain[-1])
-    elif base in ("sed", "perl") and any(str(a).startswith("-i") or str(a).startswith("--in-place") for a in args):
-        targets.extend(plain)
-    elif base == "dd":
-        targets.extend(str(a)[3:] for a in args if str(a).startswith("of="))
-    return targets
-
-
 def _protected_reason(kind, path, lane):
     if kind == "gh":
         return (f"writing {path} is blocked for everyone (gh aliases live there and can hide a merge); "
@@ -625,7 +596,7 @@ def _protected_reason(kind, path, lane):
 
 def _protected_bash_reason(infos, lane, cwd, project, home):
     for info in infos:
-        for target in _write_targets(info):
+        for target in g.write_targets(info):
             path = g.expand_path(str(target), cwd, project, home)
             reason = _protected_reason(_protected_kind(path, home), path, lane)
             if reason:
