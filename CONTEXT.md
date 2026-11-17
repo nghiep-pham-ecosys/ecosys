@@ -27,6 +27,7 @@ merge it, and `just ws-workspace` writes a gitignored local VS Code workspace th
 |---|---|---|---|---|
 | `ecosys` | public | `.` | ecosys | root repo: rules, steering, skills, hooks, tools, ADRs |
 | `.github` | public | `meta/.github` | ecosys | org profile, issue and PR templates, reusable workflows |
+| `tmpl-project` | public | `meta/tmpl-project` | ecosys | Copier template every new project repo is generated from (ADR 0005) |
 | `ops` | private | `private/ops` | ecosys | job pipeline, plans, capacity, deadlines, session logs, memory, private lessons |
 | `vault` | private | `private/vault` | profile | profile facts, stories, drafts, research notes |
 | `lab-to-prod` | public | `projects/lab-to-prod` | content | content lab: calendar, posts, blog, render and publish workflows |
