@@ -216,8 +216,8 @@ Known false positives (the guards err on the side of blocking):
 - `git worktree add` with a variable other than `$HOME`, `$CLAUDE_PROJECT_DIR` or `$PWD`.
 - Lanes: a plain-text argument that reads as shell text with `git push` in it, given to a
   program the guard does not know (`notify-send 'git push done'`).
-- Lanes: a glob whose last three parts can match `tools/ship/merge`, given to a program that
-  is not a known viewer (`rm */*/*`).
+- Lanes: a glob whose last three parts can match `tools/ship/merge` or
+  `tools/ship/stack-merge`, given to a program that is not a known viewer (`rm */*/*`).
 
 The backstops, which act on the effect instead of the text:
 
@@ -230,4 +230,5 @@ The backstops, which act on the effect instead of the text:
 - **pre-push hooks.** A pre-push hook runs inside git, so it sees a push however it was
   started (unless hooks are skipped, which the guards block for lanes).
 - **The merge tool.** `tools/ship/merge` is the one supported merge path and runs its own
-  checks; the guards only make sure nothing else is used by mistake.
+  checks; `tools/ship/stack-merge` runs it for each PR of a stack. The guards only make sure
+  nothing else is used by mistake, and block lanes from running either tool.

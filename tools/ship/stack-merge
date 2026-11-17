@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Merge a stack of PRs bottom-up, each one through tools/ship/merge.
+
+Usage:
+  tools/ship/stack-merge <pr> <pr> ... [--repo owner/name] [--base main]
+                         [--require ci-result,pr-title] [--wait-seconds 20]
+                         [--poll-seconds 30] [--check-timeout 1800] [--dry-run]
+
+Give the PRs from the bottom of the stack (based on main) to the top. For each
+PR the tool retargets the next PR to the base, runs tools/ship/merge, updates
+the next PR's branch on GitHub and waits for its checks. It stops at the first
+refusal, conflict, red check or timeout and prints the PRs that are left.
+
+Exit codes: 0 all merged (or dry run passed), 1 refused or stopped, 2 usage
+or gh error, 3 a merge command failed or could not be confirmed.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+
+import _shiplib  # noqa: E402
+import _stacklib  # noqa: E402
+
+
+def parse_args(argv: list[str]) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        prog="tools/ship/stack-merge",
+        description=(
+            "Merge stacked PRs in order. Before each merge the next PR is retargeted "
+            "to the base branch, so the branch delete of the merge cannot close it. "
+            "Each merge runs tools/ship/merge with all of its checks."
+        ),
+    )
+    parser.add_argument("numbers", type=int, nargs="+", metavar="pr",
+                        help="PR numbers, bottom of the stack first")
+    parser.add_argument("--repo", help="owner/name (default: the repo of the current directory)")
+    parser.add_argument("--base", default=_stacklib.DEFAULT_BASE,
+                        help="the branch the stack lands on (default: %(default)s)")
+    parser.add_argument(
+        "--require", default=",".join(_shiplib.DEFAULT_REQUIRED),
+        help="comma-separated checks that must exist and succeed, passed to "
+             "tools/ship/merge (default: %(default)s; pass '' for none)",
+    )
+    parser.add_argument(
+        "--wait-seconds", type=float, default=_shiplib.DEFAULT_WAIT_SECONDS,
+        help="seconds between the two reads of tools/ship/merge (default: %(default)g)",
+    )
+    parser.add_argument(
+        "--poll-seconds", type=float, default=_stacklib.DEFAULT_POLL_SECONDS,
+        help="seconds between reads while waiting for checks (default: %(default)g)",
+    )
+    parser.add_argument(
+        "--check-timeout", type=float, default=_stacklib.DEFAULT_CHECK_TIMEOUT,
+        help="seconds to wait for the next PR's checks after its branch update "
+             "(default: %(default)g)",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="check the stack, print the plan and run tools/ship/merge --dry-run "
+             "on the first PR; change nothing",
+    )
+    args = parser.parse_args(argv)
+    if any(n <= 0 for n in args.numbers):
+        parser.error("PR numbers must be positive")
+    if len(set(args.numbers)) != len(args.numbers):
+        parser.error("PR numbers must be distinct")
+    if args.wait_seconds < 0:
+        parser.error("--wait-seconds must be 0 or more")
+    if args.poll_seconds <= 0:
+        parser.error("--poll-seconds must be more than 0")
+    if args.check_timeout < 0:
+        parser.error("--check-timeout must be 0 or more")
+    return args
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(sys.argv[1:] if argv is None else argv)
+    required = [name.strip() for name in args.require.split(",") if name.strip()]
+    return _stacklib.stack_merge(
+        numbers=args.numbers,
+        repo=args.repo,
+        base=args.base,
+        required=required,
+        wait_seconds=args.wait_seconds,
+        poll_seconds=args.poll_seconds,
+        check_timeout=args.check_timeout,
+        dry_run=args.dry_run,
+    )
+
+
+if __name__ == "__main__":
+    sys.exit(main())

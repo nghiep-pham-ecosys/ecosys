@@ -17,8 +17,9 @@ core.hooksPath), define git aliases or includes (git -c / git config
 alias.*, include.*, includeIf.*), inject config through the environment
 (GIT_CONFIG_*, GIT_EXEC_PATH, HOME= or XDG_CONFIG_HOME= next to git),
 write .git/config, .git/hooks/*, ~/.gitconfig or ~/.config/git/config,
-run tools/ship/merge in any form (also `cd tools/ship && ./merge`,
-`tools/sh?p/merge`, `$DIR/merge` and symlinks: words are resolved against
+run tools/ship/merge or tools/ship/stack-merge in any form (also
+`cd tools/ship && ./merge`, `tools/sh?p/merge`, `$DIR/stack-merge` and
+symlinks: words are resolved against
 every folder a literal `cd` may have moved to, globs are matched, and
 real paths are compared), pass -c/--config/--template/--upload-pack to
 git clone (also after `gh repo clone ... --`), call write `gh api` requests, use any
@@ -42,8 +43,9 @@ filter-branch filters, --upload-pack, ...) is checked as commands. The
 safety net also reads shell text passed as one argument or here-string to
 a program it does not know (`tmux new -d 'git push'`,
 `at now <<< 'gh pr merge 3'`). Merges go
-through tools/ship/merge, which runs gh in its own subprocess, not
-through the Bash tool.
+through tools/ship/merge (or tools/ship/stack-merge, which runs it for each
+PR of a stack), which runs gh in its own subprocess, not through the Bash
+tool.
 """
 
 from __future__ import annotations
@@ -73,6 +75,10 @@ GH_CONFIG_ENV_RE = re.compile(r"^(GH_CONFIG_DIR|XDG_CONFIG_HOME|HOME)=")
 ASSIGN_PREFIX_WORDS = {"env", "export", "declare", "typeset", "readonly", "local", "sudo", "doas",
                        "command", "exec", "nohup", "nice", "setsid"}
 MERGE_TOOL = os.path.join("tools", "ship", "merge")
+STACK_MERGE_TOOL = os.path.join("tools", "ship", "stack-merge")
+# Every ship tool that merges PRs. Lanes may run none of them.
+MERGE_TOOLS = (MERGE_TOOL, STACK_MERGE_TOOL)
+MERGE_TOOL_NAMES = {os.path.basename(t) for t in MERGE_TOOLS}
 # Commands that may name the merge tool without running it (lanes may edit it).
 MERGE_TOOL_VIEWERS = {"git", "cat", "less", "more", "head", "tail", "grep", "egrep", "fgrep", "rg", "wc",
                       "ls", "stat", "file", "diff", "cmp", "sha256sum", "md5sum", "echo", "printf",
@@ -279,15 +285,19 @@ def _gh_api_reason(args, lane):
 
 def _merge_tool_tail(path):
     """True when the last three parts of path are (or, as a glob, match)
-    tools/ship/merge."""
+    tools/ship/merge or tools/ship/stack-merge."""
     parts = path.rstrip(os.sep).split(os.sep)
     if len(parts) < 3:
         return False
-    return all(fnmatch.fnmatchcase(want, got) for want, got in zip(MERGE_TOOL.split(os.sep), parts[-3:]))
+    return any(
+        all(fnmatch.fnmatchcase(want, got) for want, got in zip(tool.split(os.sep), parts[-3:]))
+        for tool in MERGE_TOOLS
+    )
 
 
 def _names_merge_tool(tok, cwds, project, links=()):
-    """True when tok (or the value of --opt=tok) is a path to tools/ship/merge.
+    """True when tok (or the value of --opt=tok) is a path to a merge tool
+    (tools/ship/merge or tools/ship/stack-merge).
 
     The word is resolved against every folder the command may run in (a
     literal `cd` earlier on the line counts), globs are matched part by part
@@ -304,7 +314,7 @@ def _names_merge_tool(tok, cwds, project, links=()):
         return False
     if isinstance(cwds, str):
         cwds = [cwds]
-    real_tool = os.path.realpath(os.path.join(project, MERGE_TOOL))
+    real_tools = {os.path.realpath(os.path.join(project, tool)) for tool in MERGE_TOOLS}
     for alt in g.brace_expand(tok):
         for cwd in cwds:
             path = g.expand_path(alt, cwd, project)
@@ -314,7 +324,7 @@ def _names_merge_tool(tok, cwds, project, links=()):
                 found = glob.glob(alias)[:64] if g.has_glob(alias) else [alias]
                 for hit in found:
                     real = os.path.realpath(hit)
-                    if real == real_tool or real.endswith(os.sep + MERGE_TOOL):
+                    if real in real_tools or any(real.endswith(os.sep + t) for t in MERGE_TOOLS):
                         return True
     return False
 
@@ -330,12 +340,12 @@ def _python_viewer(cmd):
 
 
 def _runs_merge_tool(cmd, cwds, project, lane=True, links=()):
-    """The merge tool as the command, or as an argument of anything that may run it
-    (python3 tools/ship/merge, bash /abs/tools/ship/merge, uv run ...)."""
+    """A merge tool as the command, or as an argument of anything that may run it
+    (python3 tools/ship/merge, bash /abs/tools/ship/stack-merge, uv run ...)."""
     base = os.path.basename(str(cmd[0]))
-    if _names_merge_tool(cmd[0], cwds, project, links) or (base == "merge" and "ship" in str(cmd[0])):
+    if _names_merge_tool(cmd[0], cwds, project, links) or (base in MERGE_TOOL_NAMES and "ship" in str(cmd[0])):
         return True
-    if lane and base == "merge" and g.is_dynamic(cmd[0]):
+    if lane and base in MERGE_TOOL_NAMES and g.is_dynamic(cmd[0]):
         return True  # $DIR/merge: the folder is computed and could be tools/ship
     if base in MERGE_TOOL_VIEWERS or _python_viewer(cmd):
         return False
@@ -512,7 +522,7 @@ def _check_info(info, lane, cwds, project, links=()):
         ):
             return "lanes may not skip hooks with --no-verify"
         if _runs_merge_tool(cmd, cwds, project, lane, links):
-            return "lanes may not merge; the orchestrator runs tools/ship/merge"
+            return "lanes may not merge; the orchestrator runs tools/ship/merge and tools/ship/stack-merge"
         if parts:
             reason = _check_git_lane(cmd, parts)
             if reason:
