@@ -1,13 +1,13 @@
 # Weekly review template
 
 Output path: `private/ops/reviews/YYYY-Www.md`, using the ISO week being reviewed (for example `2026-W46`). The file
-is private, so its content may be in Vietnamese. Keep the headings as below so the next review and the digest can
-find them. Every number names its source; unchecked numbers are marked *unverified*.
+is private, so its content may be in Vietnamese. Keep the headings as below so the next review can find them.
+Every number names its source; unchecked numbers are marked *unverified*.
 
 ```markdown
 # Review <YYYY-Www> (<Mon YYYY-MM-DD> – <Sun YYYY-MM-DD>)
 
-Drafted by: <scheduled task | session YYYY-MM-DD-<slug>> · Finished by Nghiep: <date, minutes spent>
+Drafted in: <session S<n> YYYY-MM-DD-<slug>> · Finished by Nghiep: <date, minutes spent>
 
 ## Hours per area
 | Area | Budget (h) | Planned (h) | Done (h) | WIP limit | In progress now |
@@ -19,6 +19,13 @@ Drafted by: <scheduled task | session YYYY-MM-DD-<slug>> · Finished by Nghiep: 
 | ecosys | | | | | |
 | work-block | fixed | | | — | — |
 | buffer | <buffer_pct>% | — | <used for> | — | — |
+
+## Agent hours (Claude Code)
+| Budget (`agent.hours`) | Buffer (`agent.buffer_pct`) | Planned (h) | Done (h, session logs) | Sessions planned / held |
+|---|---|---|---|---|
+| | | | | |
+
+Larger gap this week: <Nghiep's hours | agent hours> — <cause>
 
 ## Done (with evidence)
 - <repo>#<n> <title> — <evidence link>
@@ -42,17 +49,18 @@ Drafted by: <scheduled task | session YYYY-MM-DD-<slug>> · Finished by Nghiep: 
 - Not listed in automations.md (propose disabling): <name>
 
 ## Plan limits
-- Hit on: <dates> · Work moved because of it: <items>
+- Hit on: <dates, account> · Work moved because of it: <items>
 
 ## Decisions (Nghiep)
 - <only what Nghiep decided>
 
 ## Next week's plan
-| Area | Item | Estimate (h) | Due | Status |
-|---|---|---|---|---|
-| | | | | This week |
+| Area | Item | Owner | Estimate (h) | Due | Status |
+|---|---|---|---|---|---|
+| | | <nghiep or claude-code> | | | This week |
 
-Sum per area within budget: <yes | no → list what moved out>
+Sum per area within Nghiep's budget: <yes | no → list what moved out>
+Agent hours within `agent.hours`: <yes | no → list what moved out>
 WIP within limits: <yes | no → which area, which item waits in Next>
 
 ## Does not fit this week

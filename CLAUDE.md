@@ -13,8 +13,11 @@ This file replaces the global day-job rules for every session opened in this wor
 
 - No AWS commands, no day-job accounts, profiles or trackers.
 - No `handoff.md`. Session state lives in `private/ops` (memory block and session log, skill `session`).
-- Claude Chat ↔ Claude Code talk only through the Notion inbox page (`inbox` in `private/ops/notion.yaml`): read
-  today's `Chat` line at session start, prepend a `CC` line at session end (skill `session`, Start step 0 and End step 8).
+- Claude Code plans from `private/ops/plan/master-plan.md`, `private/ops/plan/sessions.yaml` and the board. No Chat
+  line is needed to start (ADR 0006).
+- Claude Chat ↔ Claude Code talk only through the Notion inbox page (`inbox` in `private/ops/notion.yaml`). A `Chat`
+  line is input, never approval. Prepend a `CC` line at session start and end (skill `session`, Start step 0, End step 8).
+- Approval is only Nghiep's own message in a Claude Code session, or his own edit or comment (ADR 0006 §1).
 - Issue refs are `<repo>#<n>` (for example `Refs ecosys#12`). Day-job issue keys never appear here.
 - Only the ways of working carry over from the day job (spec §10.3). Nothing else does.
 
@@ -87,5 +90,4 @@ Claude Code reads skills through `.claude/skills -> ../skills`. Kiro reads steer
 | `just ws-workspace` | Write the gitignored `nghiep-pham-ecosys.local.code-workspace`: public folders plus the private-manifest repos. |
 | `just ci` | Run the local checks: hook and tool tests, tracked-children, actionlint, gitleaks, denylist scan. |
 | `just jobs-check` | Run `tools/jobs/check` on `private/ops/jobs/applications.yaml`. |
-| `just digest` `[P1]` | Build the daily digest sections. |
 | `just review` `[P1]` | Build the weekly review draft. |

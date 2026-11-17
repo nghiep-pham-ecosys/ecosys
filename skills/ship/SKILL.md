@@ -10,7 +10,8 @@ Read the lessons for "Shipping and CI" and "Verify and Done" before merging (`le
 
 ## 0. Who does what
 
-- **Orchestrator** (main session): push, open PRs, run `tools/ship/merge`, verify, set board status.
+- **Orchestrator** (main session): push, open PRs, run `tools/ship/merge` (a stack: `tools/ship/stack-merge`), verify,
+  set board status.
 - **Lane / subagent**: code, test, commit locally in its worktree. `ship-guard` blocks push, `gh pr create/merge`,
   `gh workflow run`, `git reset --hard`, `git clean -f`, `--no-verify` and write API calls from inside
   `.tmp-session/wt/`. A lane returns the steps it needs as "live steps for the orchestrator".
@@ -59,6 +60,21 @@ Only through `tools/ship/merge` (raw `gh pr merge` is denied in settings and blo
 
 Run `tools/ship/merge --help` for its arguments. If it refuses, fix the cause; never work around it.
 A repo whose checks are not named `ci-result` and `pr-title` needs `--require <its check names>`.
+
+**A PR stack** (each PR based on the branch of the one before it) is merged with
+`tools/ship/stack-merge --repo <org>/<repo> <bottom pr> ... <top pr>`, never PR by PR by hand. A plain merge deletes
+the base branch of the next PR, and GitHub then closes that PR. For each PR in order the tool:
+
+- checks that the list is a stack: the first PR is based on `main`, each next one on `main` or the branch before it;
+- retargets the next PR to `main` (`gh api -X PATCH .../pulls/<n> -f base=main`);
+- runs `tools/ship/merge` on the PR with the same `--require` and `--wait-seconds`;
+- updates the next PR's branch on GitHub (`PUT .../pulls/<n>/update-branch`), so nothing is pushed locally;
+- waits for the next PR's new head to get green checks (`--poll-seconds`, `--check-timeout`).
+
+It stops at the first refusal, conflict, red check or timeout, and prints the merged PRs, the PRs left and the command
+to rerun for them. A refused merge puts the next PR back on its old base. A conflict in the branch update is fixed by
+hand: merge `main` into that branch in a worktree, push from the clone, then rerun the tool for the PRs left. Run it
+with `--dry-run` first to see the plan; that changes nothing.
 
 **When to merge (ADR 0006).** A PR opened in a Claude Code session is merged in that same session as soon as it is
 green. No PR is left open at the end of a session. Cloud routines open PRs and never merge them. The next local

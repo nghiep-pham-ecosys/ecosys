@@ -80,7 +80,7 @@ Deterministic, no LLM. Run it with `just jobs-check` (or `tools/jobs/check --hel
   fails.
 - Prints: today's 30-day closure proposals (`--close-after-days N` to change); follow-ups due this week; interview prep due within 48 h; the next
   actions.
-- Its output is the input for the digest and the weekly review funnel.
+- Session start runs it every session (ADR 0006); its output is also the input for the weekly review funnel.
 
 ## 5. Per-application flow
 

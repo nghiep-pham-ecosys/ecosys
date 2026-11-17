@@ -93,11 +93,13 @@ _No entries yet._
 ### In a PR stack, retarget the next PR to main before merging the one below it
 - Why: merging a stacked PR with branch deletion closed the PR that was based on that branch (GitHub closes, it does
   not retarget, when the base branch disappears) → the merge step deleted the base before the dependent PR moved.
-- How: before each merge, PATCH the next PR's base to `main`, then merge, then rebase the next branch onto the new
-  `main` (`git rebase --onto origin/main <old-base-tip> <branch>`) and wait for green checks. With gh 2.45 use
-  `gh api -X PATCH repos/<o>/<r>/pulls/<n> -f base=main`; `gh pr edit --base` fails on a Projects-classic field.
-- Seen: lab-to-prod stack #1–#8, 2026-11
-- Guard: none yet (ritual step in skills/ship; candidate: a `tools/ship/stack-merge` wrapper)
+- How: merge the whole stack with `tools/ship/stack-merge --repo <o>/<r> <bottom> ... <top>`. It retargets the next
+  PR to `main` before each merge, merges through `tools/ship/merge`, updates the next branch on GitHub and waits for
+  its checks. By hand, the same order applies; with gh 2.45 use `gh api -X PATCH repos/<o>/<r>/pulls/<n> -f base=main`
+  (`gh pr edit --base` fails on a Projects-classic field).
+- Seen: lab-to-prod stack #1–#8, 2026-11; lab-to-prod#41–#44, 2026-11-17 (four manual steps per PR, two merge
+  conflicts and a worktree push block)
+- Guard: tool `tools/ship/stack-merge` (test tools/ship/tests/test_stack_merge.py); skills/ship §3 names it
 
 ### A recreated repository may not start Actions until its Actions permission is set again
 - Why: after deleting and recreating a public repo, pull_request events fired but no workflow run was created until

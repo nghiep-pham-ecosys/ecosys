@@ -148,7 +148,7 @@ v0.2 proposed one public monorepo. v0.3 uses the **day-job pattern** instead: on
 ├── CONTEXT.md                          ← whole-system map: areas, repos, runners, data homes
 ├── repos.yaml                          ← workspace manifest: every repo, path, visibility, area
 ├── nghiep-pham-ecosys.code-workspace   ← VS Code multi-root workspace
-├── justfile                            ← ws-sync, ws-status, digest, review, ci
+├── justfile                            ← ws-sync, ws-status, jobs-check, review, ci
 ├── agents/steering/                    ← workflow.md, language-and-style.md, data-rules.md, machine-notes.md
 ├── skills/<name>/SKILL.md              ← core, session, ship, lessons, jobs, learn, content, weekly-review
 ├── .claude/
@@ -287,7 +287,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 - **Where issues live:** public-safe work in the repo it belongs to. **Anything personal (an application, a recruiter, a salary, a health or money matter) goes as an issue in private `ops`**, never in a public repo.
 - **Granularity:** one issue is about one PR or one 1–3 h task. Recurring work (daily posts, daily study) is **one weekly item**, not seven.
 - Day-job work appears only as one `work-block` item per week with the hours, so the budget adds up. Day-job tasks stay in the employer's own tracker.
-- Issue template (all repos, from `.github`): Problem · Scope (in/out) · Done when (checkable) · Estimate · Area · Where (public repo or `ops`).
+- Issue template (all repos, from `.github`): Problem · Scope (in/out) · Done when (checkable) · Estimate · Owner (`nghiep` or `claude-code`, whose weekly budget the estimate uses) · Area · Where (public repo or `ops`).
 
 ---
 

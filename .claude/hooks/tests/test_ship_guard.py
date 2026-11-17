@@ -135,6 +135,68 @@ class ShipGuardLaneTest(HookCase):
             with self.subTest(cmd=cmd):
                 self.assertAllowed("sub-bash", command=cmd)
 
+    # --- the stack merge tool is blocked for lanes in every form the merge tool is
+    def test_block_lane_running_stack_merge_tool(self):
+        self.assertBlocked("sub-bash", command="tools/ship/stack-merge --repo acme/demo 41 42",
+                           contains="tools/ship/stack-merge")
+
+    def test_block_lane_stack_merge_tool_any_form(self):
+        for cmd in (
+            "python3 tools/ship/stack-merge 41 42",
+            f"python3 {PROJECT}/tools/ship/stack-merge 41 42",
+            f"/usr/bin/python3 -u {LANE}/tools/ship/stack-merge 41 42",
+            "bash tools/ship/stack-merge 41",
+            "sh ./tools/ship/stack-merge 41",
+            "env FOO=1 tools/ship/stack-merge 41",
+            "env python3 tools/ship/stack-merge 41",
+            "./tools/ship/../ship/stack-merge 41",
+            "uv run tools/ship/stack-merge 41",
+            '"$CLAUDE_PROJECT_DIR"/tools/ship/stack-merge 41',
+            "cd tools/ship && ./stack-merge 41",
+            "cd tools && ship/stack-merge 41",
+            "tools/sh?p/stack-merge 41",
+            "tools/shi[p]/stack-merge 41",
+            "tools/ship/*-merge 41",
+            "tools/{ship,x}/stack-merge 41",
+            f"ln -s {PROJECT}/tools/ship/stack-merge sm && ./sm 41",
+            "D=tools/ship; $D/stack-merge 41",
+            '"$X"/stack-merge 41',
+            "python3 -m pdb tools/ship/stack-merge 41",
+        ):
+            with self.subTest(cmd=cmd):
+                self.assertBlocked("sub-bash", command=cmd, contains="merge")
+
+    def test_block_stack_merge_tool_with_glob_in_the_name(self):
+        # Blocked as a computed command name, before the merge tool check.
+        for cmd in ("tools/ship/stack-m[e]rge 41", "tools/ship/stack-* 41"):
+            with self.subTest(cmd=cmd):
+                self.assertBlocked("sub-bash", command=cmd)
+
+    def test_block_stack_merge_tool_from_wt_cwd_and_relative(self):
+        self.assertBlocked("sub-wt-bash", command="python3 tools/ship/stack-merge 41 42")
+        self.assertBlocked("sub-bash", command="python3 stack-merge 41 42", cwd=PROJECT + "/tools/ship")
+        self.assertBlocked("sub-bash", command="./stack-merge 41 42", cwd=PROJECT + "/tools/ship")
+
+    def test_pass_lane_touching_stack_merge_tool_source(self):
+        for cmd in (
+            "git add tools/ship/stack-merge tools/ship/_stacklib.py",
+            "git diff -- tools/ship/stack-merge",
+            "cat tools/ship/stack-merge",
+            "sed -n 1,20p tools/ship/stack-merge",
+            "chmod +x tools/ship/stack-merge",
+            "python3 -m py_compile tools/ship/stack-merge",
+            "python3 -m unittest tools/ship/tests/test_stack_merge.py",
+        ):
+            with self.subTest(cmd=cmd):
+                self.assertAllowed("sub-bash", command=cmd)
+
+    def test_pass_main_running_stack_merge_tool(self):
+        for cmd in ("tools/ship/stack-merge --repo acme/demo 41 42",
+                    "/usr/bin/python3 tools/ship/stack-merge 41 42",
+                    "cd tools/ship && ./stack-merge 41 42"):
+            with self.subTest(cmd=cmd):
+                self.assertAllowed("main-bash", command=cmd)
+
     # --- git long-option abbreviations (git accepts any unique prefix)
     def test_block_abbreviated_long_options(self):
         for cmd in (
