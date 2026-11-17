@@ -37,6 +37,20 @@ to `guards.md` in the same PR.
   process-sim-lab#7, #8, 2026-11-17 (push or merge chained with a worktree command, 4 blocks)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
+### Check the repo before building what an issue says is missing
+- Why: physic-ai-for-everyone#16 said lesson 01 had no exercises, but 4 existed; only the test that runs them was
+  missing → the issue's premise was taken as fact.
+- How: grep the repo for the thing first; build only the gap and say so in the PR.
+- Seen: physic-ai-for-everyone#16, 2026-11-17
+- Guard: lane brief "Read first" (skills/core issue-and-brief)
+
+### A rule that sorts items by a field names where the field lives
+- Why: the two-budget rule split items by owner, but no board field or issue section held an owner → an agent could
+  not apply it.
+- How: name the source (board field, issue-body section or file) and the default when it is missing.
+- Seen: ecosys#42, 2026-11-17
+- Guard: reviewer-correctness
+
 ## Verify and Done
 
 ### Copy a physical constant or citation from the primary table, never from memory
@@ -53,6 +67,19 @@ to `guards.md` in the same PR.
 - Guard: reviewer-correctness recomputes test values
 
 _No entries yet._
+
+### Look for a routine's output before saying it ran
+- Why: a plan said a routine ran on 14/11, but the repo had no branch or PR from it → a schedule was read as a run.
+- How: find the PR, branch or log line the run should have left; otherwise write "unverified".
+- Seen: ops#45, 2026-11-17
+- Guard: hard rule 10 (live status) + automations.md "last verified run" column
+
+### After a decision lands early, update every later slot that waits for it
+- Why: ADR 0005 merged on 17/11 while the master plan still had a W48 draft slot, a 29/11 decision and an open risk
+  for it → only the item itself was updated.
+- How: grep the plan and schedule for the decision's name and fix each row in the same PR.
+- Seen: ops#43, 2026-11-17
+- Guard: none yet (weekly review drift check)
 
 ## Shipping and CI
 
@@ -118,6 +145,25 @@ _No entries yet._
 - Seen: ops#33, 2026-11-16
 - Guard: none: external GitHub check status not refreshed
 
+### A validator that starts requiring a field plans the existing data in the same change
+- Why: requiring `work:` from W48 made every W48+ calendar item invalid, so the PR had to park them all to pass its
+  own CI → the rule was added without its data migration.
+- How: in the same PR, fix or park the data past the start date, and say which follow-up PR fills it again.
+- Seen: lab-to-prod#34, 2026-11-17
+- Guard: the validator's own test on the real calendar
+
+### A PR that enforces a convention updates every doc that states the old one
+- Why: a pr-title check was added while CONTRIBUTING, CLAUDE.md and the PR template still taught the old title form.
+- How: grep for the old form and change it in the same PR.
+- Seen: physic-ai-for-everyone#17, 2026-11-17
+- Guard: reviewer-correctness
+
+### Read issues with `gh issue view --json`
+- Why: plain `gh issue view` exits 1 on these repos: its query asks for Projects (classic) cards, which are retired.
+- How: `gh issue view <n> -R <repo> --json title,body,comments`.
+- Seen: lab-to-prod lanes, 2026-11-17
+- Guard: none (tool behaviour)
+
 ## Publishing
 
 ### Check the live profile and the publish record before any manual post
@@ -178,6 +224,26 @@ _No entries yet._
 - Seen: lab-to-prod PR #1, 2026-11
 - Guard: hook pre-push denylist scan (local denylist, never committed) + ci hash-only check in public repos (spec §10.2)
 
+### A parse check in a repo with personal data prints the location, not the parser message
+- Why: a YAML parser's error text includes the offending source line, so a CI parse check would copy private content
+  into the log.
+- How: print file, line and a fixed problem text; never `str(exception)`.
+- Seen: vault#1, 2026-11-17
+- Guard: vault `tools/check-yaml`
+
+### Every value in a guard's block message goes through the mask
+- Why: with no manifest, the public-safe guard printed a repo name taken from the command unmasked, so a listed term
+  could leak through the block message itself.
+- How: route names, paths and terms through `mask()` before printing.
+- Seen: ecosys#8, 2026-11-17
+- Guard: hook public-safe-guard tests
+
+### Write text that names the denylist path with the Write tool, not in a Bash command
+- Why: secret-path-guard scans command text for the path, so a heredoc that edited docs mentioning it was blocked.
+- How: edit such docs with Write/Edit or a script file.
+- Seen: ecosys#8, 2026-11-17
+- Guard: hook secret-path-guard (by design)
+
 ## Data and tools
 
 ### Run a src-layout package's tests with PYTHONPATH=src in a fresh worktree
@@ -209,3 +275,17 @@ _No entries yet._
 - How: run `just ws-sync` (or `git fetch`) before `just ws-status`, and say which one ran when reporting state.
 - Seen: ops, 2026-11-16
 - Guard: none: judgement until ws-status fetches itself (candidate change to tools/ws)
+
+### Render a local Copier template with an explicit `--vcs-ref`
+- Why: without a ref, Copier renders the latest tag, not the working tree, so template tests would check old code
+  once v0.1.0 is tagged.
+- How: pass `--vcs-ref HEAD` in tests; pass a tag for releases.
+- Seen: tmpl-project v0.1, 2026-11-17
+- Guard: tmpl-project tests
+
+### Check a download against a checksum file by fields, not by an exact line
+- Why: `sha256sum` binary mode writes `<sha> *<file>`; an exact two-space grep failed every CI install.
+- How: compare the hash and file name fields and strip a leading `*`.
+- Seen: tmpl-project v0.1, 2026-11-17
+- Guard: tmpl-project `scripts/install-tools` tests
+
