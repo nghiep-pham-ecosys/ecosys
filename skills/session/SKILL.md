@@ -1,12 +1,23 @@
 ---
 name: session
-description: Start and end rituals for a working session in the nghiep-pham-ecosys workspace. At start it reads memory, the last session log and the board, checks reality read-only (ws-status, red runs, open PRs, deadlines within 48 h), reports drift, reads lessons and proposes 3 to 5 items within budget. During the session it keeps the live checklist and pending lessons in .tmp-session. At the end it settles board items, moves lessons, batches external drafts for approval, writes the session log and memory block, and leaves every repo clean. Use it when Nghiep says "start a session", "new session", "wrap up", "end the session", "close out", or when a session starts without context. It does not cover merging and Done (ship), the lesson format (lessons) or the Sunday plan (weekly-review).
+description: Start and end rituals for a working session in the nghiep-pham-ecosys workspace. At start it reads memory, the last session log and the board, checks reality read-only (ws-status, red runs, open PRs, deadlines within 48 h), reports drift, reads lessons and proposes 3 to 5 items within budget. During the session it keeps the live checklist and pending lessons in .tmp-session. At the end it settles board items, moves lessons, batches external drafts for approval, writes the session log and memory block, and leaves every repo clean. A session starts only when Nghiep says "bắt đầu session mới" (or "start a session", "new session") and ends only when he says "dừng phiên ở đây" (or "wrap up", "end the session", "close out"). Use it then, or when a session starts without context. It does not cover merging and Done (ship), the lesson format (lessons) or the Sunday plan (weekly-review).
 ---
 
 # session
 
 Precedence when sources disagree: repo > canonical doc > memory > skill. Report drift; never resolve it silently.
 Chat with Nghiep in Vietnamese. Files in public repos stay in English.
+
+## Session number and handover
+
+- Every working session has a number `S<n>`, counted across all agents (Claude Code, Kiro). The next number is the
+  last row of the index in `private/ops/sessions/README.md` plus one. A session still open in
+  `.tmp-session/checklist.md` keeps its number.
+- The number goes in the checklist header, the log title, the index row, the memory block heading and every inbox
+  line of the session (`CC · S<n> · ...`).
+- Handover (for example Claude Code hits its limit and Kiro continues): the next agent reads
+  `.tmp-session/checklist.md` first, keeps the same `S<n>`, adds its name to the checklist `Agent:` line, and goes on
+  from the first open item. The log records both agents. The checklist is the only handover note: no new handoff files.
 
 ## Start (spec §9.2)
 
@@ -20,8 +31,11 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
      of the form `<today YYYY-MM-DD> · Chat · Hôm nay CC: ...`. It is the list of work Nghiep agreed with Claude Chat
      for Claude Code today: step 5 proposes only items inside it. Steps 1–4 still run (ws-status, red runs, open PRs,
      drift), and anything urgent they find is reported, not silently added.
-   - No line for today → tell Nghiep to run "bắt đầu ngày làm việc" in Claude Chat first. No usable Notion server →
-     say so and fall back to step 5 as written.
+   - No line for today → plan from `private/ops/plan/master-plan.md`, `plan/sessions.yaml` and the board
+     (Nghiep, 2026-11-17: Claude Code drives the work; Claude Chat reports). The full rewrite of this step is
+     ecosys#42. No usable Notion server → say so and plan the same way.
+   - Prepend a start line to the inbox: `<YYYY-MM-DD> · CC · Bắt đầu S<n> <HH:MM> · việc: ...`, so Claude Chat can
+     report to Nghiep.
 1. **Read what was recorded.**
    - The newest block of `private/ops/memory.md` (only the newest; older blocks only when history is needed).
    - The newest session log in `private/ops/sessions/`.
@@ -42,7 +56,8 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
 5. **Propose 3–5 items within today's inbox list (step 0) and the area budgets** (`private/ops/plan/capacity.yaml`, WIP limits). For each: what, why,
    how it will be verified. Unfinished `In progress` items come before new ones: close with evidence, finish, or
    record what blocks them. Items with a hard deadline come first.
-6. **After Nghiep agrees:** create `.tmp-session/checklist.md` and start.
+6. **After Nghiep agrees:** create `.tmp-session/checklist.md` with the header `# S<n> · Session <YYYY-MM-DD> <slug>`
+   and the line `Agent: <name> (<where>) · Started <HH:MM>`, then start.
 
 Output of the start: a short block in Vietnamese with state (3–5 lines, each with its source), drift, and the
 proposed items.
