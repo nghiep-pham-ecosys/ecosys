@@ -40,10 +40,6 @@ board-export *args:
 skills-zip *args:
     {{python}} tools/skills/pack "$@"
 
-# Daily digest
-digest:
-    @echo "[P1] not built yet"
-
 # Weekly review draft
 review:
     @echo "[P1] not built yet"

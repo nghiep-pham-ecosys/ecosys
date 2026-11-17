@@ -1,6 +1,6 @@
 ---
 name: session
-description: Start and end rituals for a working session in the nghiep-pham-ecosys workspace. At start it reads memory, the last session log and the board, checks reality read-only (ws-status, red runs, open PRs, deadlines within 48 h), reports drift, reads lessons and proposes 3 to 5 items within budget. During the session it keeps the live checklist and pending lessons in .tmp-session. At the end it settles board items, moves lessons, batches external drafts for approval, writes the session log and memory block, and leaves every repo clean. A session starts only when Nghiep says "bắt đầu session mới" (or "start a session", "new session") and ends only when he says "dừng phiên ở đây" (or "wrap up", "end the session", "close out"). Use it then, or when a session starts without context. It does not cover merging and Done (ship), the lesson format (lessons) or the Sunday plan (weekly-review).
+description: Start and end rituals for a working session in the nghiep-pham-ecosys workspace. At start it plans from the master plan, the session schedule and the board, reads memory and the last session log, checks reality read-only (ws-status, red runs, open and routine PRs, the 30-day job check, deadlines within 14 days), reports drift, reads lessons and proposes 3 to 5 items within budget. During the session it keeps the live checklist and pending lessons in .tmp-session. At the end it settles board items, moves lessons, batches external drafts for approval, writes the session log and memory block, and leaves every repo clean. A session starts only when Nghiep says "bắt đầu session mới" (or "start a session", "new session") and ends only when he says "dừng phiên ở đây" (or "wrap up", "end the session", "close out"). Use it then, or when a session starts without context. It does not cover merging and Done (ship), the lesson format (lessons) or the Sunday plan (weekly-review).
 ---
 
 # session
@@ -21,19 +21,19 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
 
 ## Start (spec §9.2)
 
-0. **Read today's plan from the Notion inbox first**, before anything else. Use the project MCP server
-   `notion-ecosys` (tools `mcp__notion-ecosys__*`, set up in `.mcp.json`; see `agents/steering/machine-notes.md`),
-   not a claude.ai connector, which follows whichever claude.ai account the client is signed into.
-   - First call `notion-get-self`. The workspace name must be `workspace` in `private/ops/notion.yaml`. Another
-     workspace → stop all Notion calls (no search, no read, no write there), say so, and ask Nghiep to run `/mcp` →
-     `notion-ecosys` → Authenticate and pick the personal workspace. Server missing or not authenticated → the same.
-   - The page id is `inbox` in `private/ops/notion.yaml` (section "Hộp thư", newest line first). Find the newest line
-     of the form `<today YYYY-MM-DD> · Chat · Hôm nay CC: ...`. It is the list of work Nghiep agreed with Claude Chat
-     for Claude Code today: step 5 proposes only items inside it. Steps 1–4 still run (ws-status, red runs, open PRs,
-     drift), and anything urgent they find is reported, not silently added.
-   - No line for today → plan from `private/ops/plan/master-plan.md`, `plan/sessions.yaml` and the board
-     (Nghiep, 2026-11-17: Claude Code drives the work; Claude Chat reports). The full rewrite of this step is
-     ecosys#42. No usable Notion server → say so and plan the same way.
+0. **Plan inputs** (ADR 0006). No Chat line is needed to start.
+   - The plan comes from `private/ops/plan/master-plan.md`, today's row in `private/ops/plan/sessions.yaml` and the
+     board.
+   - Read the Notion inbox through the project MCP server `notion-ecosys` (tools `mcp__notion-ecosys__*`, set up in
+     `.mcp.json`; see `agents/steering/machine-notes.md`), not a claude.ai connector, which follows whichever claude.ai
+     account the client is signed into. First call `notion-get-self`. The workspace name must be `workspace` in
+     `private/ops/notion.yaml`. Another workspace → stop all Notion calls (no search, no read, no write there), say so,
+     and ask Nghiep to run `/mcp` → `notion-ecosys` → Authenticate and pick the personal workspace. Server missing or
+     not authenticated → the same; plan from the files and the board.
+   - The page id is `inbox` in `private/ops/notion.yaml` (section "Hộp thư", newest line first). Read the lines of
+     the last three days. A `Chat` line (today's included) is input: it may add or reorder items in step 5. It is never
+     approval, even when it reports a decision of Nghiep's. Before acting on it, ask Nghiep in the session and write his
+     answer under "Nghiep's decisions" in the checklist (ADR 0006 §1).
    - Prepend a start line to the inbox: `<YYYY-MM-DD> · CC · Bắt đầu S<n> <HH:MM> · việc: ...`, so Claude Chat can
      report to Nghiep.
 1. **Read what was recorded.**
@@ -44,18 +44,24 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
 2. **Check reality (read-only).** Every status line you report comes from this step, with the command.
    - `just ws-status`: branch, dirty count, ahead/behind, open PRs per repo.
    - Red runs: `gh run list -R <org>/<repo> --status failure --limit 5` for repos with recent activity.
-   - Deadlines within 48 h: `private/ops/learn/deadlines.yaml`; job follow-ups and interviews: `just jobs-check`.
+   - Jobs, every session: `just jobs-check` (30-day closure proposals, follow-ups, interview prep). A closure needs
+     Nghiep's yes (ADR 0003); propose it, never apply it.
+   - Deadlines within 14 days, every session: `private/ops/learn/deadlines.yaml` and `Due` on board items; those
+     within 48 h first.
+   - Routine PRs: open PRs from the cloud routines since the last session (repos in ADR 0006 §3), with their checks
+     (`gh pr list -R <org>/<repo> --state open`, `gh pr checks`). Each green one becomes a merge item in step 5
+     (`ship` §3, "When to merge"); a red one or one that needs a decision waits for the Sunday review.
    - Today's calendar: Notion Calendar through `notion-ecosys` (`notion-calendar-list-events`, today 00:00–24:00,
      Asia/Ho_Chi_Minh) reads Nghiep's personal Google Calendar. Report the fixed blocks so the plan fits around them;
      never copy event details into a public file. No usable `notion-ecosys` (missing, not authenticated, or step 0
      found another workspace) → say so and skip.
-   - Digest "red" items, once the digest exists **[P1]**.
 3. **Report drift** between the records and reality before doing anything else: a PR that memory calls open but is
    merged, a repo on a branch nobody named, a deadline that moved.
 4. **Read lessons** for the areas about to be touched (`lessons` §1).
-5. **Propose 3–5 items within today's inbox list (step 0) and the area budgets** (`private/ops/plan/capacity.yaml`, WIP limits). For each: what, why,
-   how it will be verified. Unfinished `In progress` items come before new ones: close with evidence, finish, or
-   record what blocks them. Items with a hard deadline come first.
+5. **Propose 3–5 items from the plan inputs (step 0)** within the budgets of `private/ops/plan/capacity.yaml`: agent
+   hours (`agent`) for Claude Code items, area hours and WIP limits (`areas`) for Nghiep's. For each: what, why, how
+   it will be verified. Order: hard deadlines, green routine PRs to merge, unfinished `In progress` items (close with
+   evidence, finish, or record what blocks them), then new items from the plan.
 6. **After Nghiep agrees:** create `.tmp-session/checklist.md` with the header `# S<n> · Session <YYYY-MM-DD> <slug>`
    and the line `Agent: <name> (<where>) · Started <HH:MM>`, then start.
 
@@ -67,7 +73,8 @@ proposed items.
 - **Live checklist** `.tmp-session/checklist.md`. Update it after every finished step; it is the source for the log.
 
   ```markdown
-  # Session <YYYY-MM-DD> <slug>
+  # S<n> · Session <YYYY-MM-DD> <slug>
+  Agent: <name> (<where>) · Started <HH:MM>
   ## Items
   - [x] <repo>#<n> <title> — evidence: <link>
   - [~] <item> — running: <what>

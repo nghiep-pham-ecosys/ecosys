@@ -148,7 +148,7 @@ v0.2 proposed one public monorepo. v0.3 uses the **day-job pattern** instead: on
 ├── CONTEXT.md                          ← whole-system map: areas, repos, runners, data homes
 ├── repos.yaml                          ← workspace manifest: every repo, path, visibility, area
 ├── nghiep-pham-ecosys.code-workspace   ← VS Code multi-root workspace
-├── justfile                            ← ws-sync, ws-status, digest, review, ci
+├── justfile                            ← ws-sync, ws-status, jobs-check, review, ci
 ├── agents/steering/                    ← workflow.md, language-and-style.md, data-rules.md, machine-notes.md
 ├── skills/<name>/SKILL.md              ← core, session, ship, lessons, jobs, learn, content, weekly-review
 ├── .claude/
