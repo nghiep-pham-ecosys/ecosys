@@ -1,6 +1,6 @@
 # ADR 0004: AI engineering lab monorepo
 
-- **Status:** Accepted; amended by ADR 0005 (decision 4, Publishing, Capacity and routines, Phases, Follow-ups)
+- **Status:** Accepted; amended by ADR 0005 (decision 4, Relation to `tmpl-project`, Lessons review date, Publishing, Capacity and routines, Phases, Revisit when, Follow-ups)
 - **Date:** 2026-11-16
 
 ## Context
