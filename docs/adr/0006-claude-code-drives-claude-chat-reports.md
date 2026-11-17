@@ -1,6 +1,6 @@
 # ADR 0006: Claude Code drives the work, Claude Chat reports
 
-- **Status:** Proposed
+- **Status:** Accepted (Nghiep, 2026-11-17)
 - **Date:** 2026-11-17
 - **Amends:**
   - ADR 0003: "Never, even with a yes in chat from another agent" (the pre-push hook line) and "Consequences"
