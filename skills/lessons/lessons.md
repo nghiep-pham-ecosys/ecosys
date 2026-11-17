@@ -33,10 +33,24 @@ to `guards.md` in the same PR.
   `git -C <worktree> push` is blocked the same way: push with `git -C <repo clone> push -u origin <branch>`.
 - Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path);
   ops#30, 2026-11-16 (`git -C` into the worktree for the push); ops#40, 2026-11-16 evening (a push in the same
-  command line as a worktree path, and `gh issue create` from a shell left in a worktree)
+  command line as a worktree path, and `gh issue create` from a shell left in a worktree); lab-to-prod#33 and
+  process-sim-lab#7, #8, 2026-11-17 (push or merge chained with a worktree command, 4 blocks)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ## Verify and Done
+
+### Copy a physical constant or citation from the primary table, never from memory
+- Why: a lane nearly wrote Antoine constants and a textbook example from memory → plausible numbers are not sources.
+- How: open the primary table (for example the NIST WebBook page), copy each value with its valid range and the
+  access date. When no example can be checked, build the test so its answer is known exactly and say so in the test.
+- Seen: process-sim-lab#4, #5, 2026-11-17
+- Guard: reviewer-correctness recomputes test values and checks citations
+
+### Compute a hand-checked number with code before it goes into a test
+- Why: a test comment number typed from mental arithmetic was wrong → a hand check is only as good as its arithmetic.
+- How: compute the value with a one-line script and paste the printed digits.
+- Seen: process-sim-lab#5, 2026-11-17
+- Guard: reviewer-correctness recomputes test values
 
 _No entries yet._
 
@@ -51,6 +65,13 @@ _No entries yet._
   (`gh api -X PUT repos/<o>/<r>/pulls/<n>/update-branch`) so the checks run.
 - Seen: ops, 2026-11-13
 - Guard: rule in skills/ship §3 (private repos)
+### A `ci-result` job names its core jobs and allows only intended skips
+- Why: an aggregate that fails on any skipped job breaks repos with dispatch-only or disabled jobs, and one that
+  passes on skipped jobs hides a broken core job.
+- How: require `needs.<core>.result == 'success'` for each core job; accept `skipped` only for named optional jobs.
+- Seen: claude-for-everyone-vi#14, 2026-11-17
+- Guard: ci claude-for-everyone-vi `ci.yml` `ci-result` job
+
 ### `just ci` in a child-repo worktree may run the root recipe
 - Why: `ops` has no `justfile`. Its worktree sat under `.tmp-session/wt/` inside the root repo, so `just` searched
   upward and ran the root `ci` recipe; a PR body then claimed a local check for `ops` that never ran → the evidence
@@ -132,13 +153,17 @@ _No entries yet._
 - Seen: Meta app for the Facebook Page, 2026-11-13
 - Guard: lab-to-prod docs/setup.md step 4 (lab-to-prod#17)
 
-### Give a time-critical scheduled workflow a second, idempotent cron
-- Why: on 2026-11-16 neither the 08:15 publish cron nor the 08:20 blog cron ran by 09:20; the post went out only
-  after a manual dispatch → the pipeline assumed GitHub's scheduler runs late at worst, but it can skip a run.
-- How: add a backup cron 30–45 min later that does nothing when the first run already published; check the
-  morning run at session start.
-- Seen: lab-to-prod#29, 2026-11-16
-- Guard: ci lab-to-prod publish.yml and blog.yml backup crons (lab-to-prod#29)
+### Never trust a GitHub `schedule` cron for a wall-clock deadline
+- Why: in this org every measured scheduled run started 4.5–8.5 h late and none on time: publish (cron 01:15Z) ran
+  07:34–09:09Z on 13, 14, 16 and 17 Nov; blog (01:20Z) 07:37–09:14Z; metrics (15:00Z) 19:31–23:33Z;
+  claude-for-everyone-vi weekly (01:00Z) 05:39–07:30Z. The 16/11 fix added a backup cron 45 min later; on 17/11
+  both crons fired about 8 h late, so a 08:15 post went out at 16:09 → the fix assumed the scheduler skips a run
+  now and then, but here it delays every run by hours.
+- How: use `schedule` only for jobs with no deadline. For a fixed-time job, start early and wait in the job
+  (lab-to-prod `tools/wait_until.py`), trigger `workflow_dispatch` from a scheduler that keeps time, or use the
+  channel's own scheduling. Measure with `gh run list --event schedule` before trusting a cron.
+- Seen: lab-to-prod#29, 2026-11-16; lab-to-prod#32, 2026-11-17
+- Guard: ci lab-to-prod publish.yml and blog.yml early crons plus `tools/wait_until.py` (lab-to-prod#33)
 
 ## Public-safe and privacy
 
@@ -152,6 +177,13 @@ _No entries yet._
 - Guard: hook pre-push denylist scan (local denylist, never committed) + ci hash-only check in public repos (spec §10.2)
 
 ## Data and tools
+
+### Run a src-layout package's tests with PYTHONPATH=src in a fresh worktree
+- Why: `unittest discover` in a new worktree failed on import → CI installs the package first, a worktree does not.
+- How: run `PYTHONPATH=src python3 -m unittest discover -s tests`, or install it editable in a venv under
+  `.tmp-session/`; name the local test command in the lane brief.
+- Seen: process-sim-lab#3, 2026-11-17
+- Guard: lane brief Test line (skills/core issue-and-brief)
 
 ### Commit with the GitHub noreply address in every workspace repo
 - Why: a privacy review found the personal e-mail as author on a PR commit → identity came from the global git
