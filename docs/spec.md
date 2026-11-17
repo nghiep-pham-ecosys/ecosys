@@ -390,7 +390,7 @@ Each skill: `SKILL.md` ≤ ~150 lines, a description that names its triggers and
 | `ship-guard` (PreToolUse Bash) | commands run from inside `.tmp-session/wt/` (lanes): block `git push`, `git reset --hard`, `git clean -f`, `--no-verify`, `gh pr create/merge`, `gh workflow run`, write API calls. For everyone: block raw `gh pr merge` outside `tools/ship/merge`. |
 | `secret-path-guard` (PreToolUse Read/Edit/Write/Bash) | block `.env*`, `*.pem`, `*.key`, `*.sops.*` decryption, `~/.config/sops/**`, and the local denylist file |
 | `worktree-guard` | `git worktree add` only with an absolute path under `.tmp-session/wt/` |
-| `public-safe-guard` `[P1]` | on commits, PR titles/bodies and issue text in **public** repos: block names in the local denylist (§10.2) |
+| `public-safe-guard` (PreToolUse Write/Edit/MultiEdit/NotebookEdit/Bash) | on files, commits, PR titles/bodies and issue text in **public** repos: block names in the local denylist (§10.2) |
 
 Each hook has tests built from real payload fixtures (one block case, one near-miss pass case), run in `ecosys` CI.
 
