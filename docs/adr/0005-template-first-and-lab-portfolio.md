@@ -1,6 +1,6 @@
 # ADR 0005: Template first, and the lab portfolio
 
-- **Status:** Proposed (set to Accepted, with the date, after Nghiep's yes on this text)
+- **Status:** Accepted (Nghiep, 2026-11-17)
 - **Date:** 2026-11-17
 - **Amends ADR 0004:**
   - decision 4;
