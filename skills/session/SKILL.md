@@ -59,8 +59,8 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
    merged, a repo on a branch nobody named, a deadline that moved.
 4. **Read lessons** for the areas about to be touched (`lessons` §1).
 5. **Propose 3–5 items from the plan inputs (step 0)** within the budgets of `private/ops/plan/capacity.yaml`: agent
-   hours (`agent`) for Claude Code items, area hours and WIP limits (`areas`) for Nghiep's. For each: what, why, how
-   it will be verified. Order: hard deadlines, green routine PRs to merge, unfinished `In progress` items (close with
+   hours (`agent`) for Claude Code items, area hours and WIP limits (`areas`) for Nghiep's. The owner comes from the
+   issue's `## Owner` section (weekly-review §3). For each: what, why, how it will be verified. Order: hard deadlines, green routine PRs to merge, unfinished `In progress` items (close with
    evidence, finish, or record what blocks them), then new items from the plan.
 6. **After Nghiep agrees:** create `.tmp-session/checklist.md` with the header `# S<n> · Session <YYYY-MM-DD> <slug>`
    and the line `Agent: <name> (<where>) · Started <HH:MM>`, then start.

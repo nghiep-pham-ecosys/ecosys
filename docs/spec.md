@@ -287,7 +287,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 - **Where issues live:** public-safe work in the repo it belongs to. **Anything personal (an application, a recruiter, a salary, a health or money matter) goes as an issue in private `ops`**, never in a public repo.
 - **Granularity:** one issue is about one PR or one 1–3 h task. Recurring work (daily posts, daily study) is **one weekly item**, not seven.
 - Day-job work appears only as one `work-block` item per week with the hours, so the budget adds up. Day-job tasks stay in the employer's own tracker.
-- Issue template (all repos, from `.github`): Problem · Scope (in/out) · Done when (checkable) · Estimate · Area · Where (public repo or `ops`).
+- Issue template (all repos, from `.github`): Problem · Scope (in/out) · Done when (checkable) · Estimate · Owner (`nghiep` or `claude-code`, whose weekly budget the estimate uses) · Area · Where (public repo or `ops`).
 
 ---
 

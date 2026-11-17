@@ -42,6 +42,9 @@ Out: …
 ## Estimate
 <hours>
 
+## Owner
+<nghiep | claude-code>  (whose weekly budget the estimate uses, weekly-review §3)
+
 ## Area / Where
 <jobs|learn|content|lab|ecosys> · <public repo name | ops>
 ```

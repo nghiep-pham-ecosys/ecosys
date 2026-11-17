@@ -34,7 +34,8 @@ Every number in the draft names its source. A number that could not be checked i
 
 ## 3. Capacity and WIP rules (spec §2)
 
-- **Two budgets.** An item's `Estimate (h)` counts against the owner's budget:
+- **Two budgets.** An item's `Estimate (h)` counts against the owner's budget. The owner is the `## Owner` section
+  of the issue body (`core` references/issue-and-brief.md); an issue without one counts as `nghiep` until it gets one.
   - owner `claude-code`: agent hours. The sum for the week must not exceed `agent.hours`, less `agent.buffer_pct`.
   - owner `nghiep`: that area's hours. The sum of an area's items set to `This week` must not exceed
     `areas.<area>.hours`.
