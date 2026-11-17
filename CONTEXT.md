@@ -41,13 +41,15 @@ Not part of this workspace: other folders under `~/projects`, forks of third-par
 
 | Runner | Runs | Limits |
 |---|---|---|
-| Claude Code sessions | building and changing repos; drafts that need judgement | Claude plan limits |
-| Claude scheduled tasks | mail checks, draft work, digest text, Sunday review draft `[P1]` | plan limits; each task is listed in `private/ops/automations.md` |
-| GitHub Actions in `ops` (private) | deterministic jobs: `tools/jobs/check`, deadline scan, capacity check `[P1]` | private-repo minutes *(verify)*; at most daily |
+| Claude Code sessions | drive the work: all project code and posts, the deadline and 30-day checks at session start, the Sunday review with Nghiep | Claude plan limits; sessions per week in `private/ops/plan/sessions.yaml` |
+| Claude Chat | secretary: daily and weekly reports from the inbox and `ops` files; job search and forms with Nghiep | plan limits; no project code, no posts, never approval (ADR 0006) |
+| Claude cloud routines | at most two repo routines, one small PR per run, never merge (ADR 0006 §3) | Nghiep's personal claude.ai account; each task is listed in `private/ops/automations.md` |
+| GitHub Actions in `ops` (private) | deterministic jobs: capacity check `[P1]`; a scheduled deadline and 30-day scan is a 2027-Q1 option after a yes | private-repo minutes *(verify)*; at most daily |
 | GitHub Actions in public repos | CI, lab-to-prod validate, render, publish | logs are public: no private data |
 | `just` + `tools/` locally | `ws-sync`, `ws-status`, `ci`, `jobs-check` | no LLM |
 
-Notifications go to one channel: the Telegram bot `[P1]`. LLM work runs inside Claude subscriptions only (no paid API).
+There is no daily digest (ADR 0006): session start runs the checks and Claude Chat reports to Nghiep. LLM work runs
+inside Claude subscriptions only (no paid API).
 
 ## Data homes
 
@@ -73,6 +75,9 @@ Rules: `agents/steering/data-rules.md`. Writing guide: `docs/standards/public-sa
 | Applications and their stages | `private/ops/jobs/applications.yaml` |
 | Learning deadlines | `private/ops/learn/deadlines.yaml` |
 | Weekly budget and WIP limits | `private/ops/plan/capacity.yaml` |
+| Plan for the coming weeks, decisions and dates | `private/ops/plan/master-plan.md` |
+| Claude Code session schedule (agent sessions per week) | `private/ops/plan/sessions.yaml` |
+| Board snapshot for Claude Chat | `private/ops/plan/board.md` (`just board-export`, written at session end) |
 | Scheduled tasks | `private/ops/automations.md` |
 | Session history and memory | `private/ops/sessions/`, `private/ops/memory.md` |
 | Lessons (public-safe) | `skills/lessons/lessons.md` |
@@ -80,7 +85,8 @@ Rules: `agents/steering/data-rules.md`. Writing guide: `docs/standards/public-sa
 | Names that must never appear in public | `private/ops/boundaries.md` + local denylist |
 | Board items and their status | org GitHub Project "Ecosys board" (private) |
 | Post calendar and drafts | `projects/lab-to-prod` |
+| Merged project work that posts may cite (work ledger) | `projects/lab-to-prod/content/work.yaml` |
 | Profile facts `[P1]` | `private/vault/profile/profile.yaml` |
 | Research and reading notes, content ideas, messages between Claude Code and Claude Chat | Notion workspace (private; ids in `private/ops/notion.yaml`) |
 | Dashboard and project overview in Notion | a mirror of the rows above, written at session end (skill `session`); edit the source, not the mirror |
-| Calendar time blocks | Google Calendar; area mapping in `private/ops/plan/routine.yaml` |
+| Nghiep's calendar time blocks | Google Calendar; area mapping in `private/ops/plan/routine.yaml` |
