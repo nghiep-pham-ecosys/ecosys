@@ -2,6 +2,7 @@
   "folders": [
     { "name": "ecosys (root)", "path": "." },
     { "name": ".github", "path": "meta/.github" },
+    { "name": "tmpl-project", "path": "meta/tmpl-project" },
     { "name": "ops", "path": "private/ops" },
     { "name": "vault", "path": "private/vault" },
     { "name": "lab-to-prod", "path": "projects/lab-to-prod" },

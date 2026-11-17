@@ -9,6 +9,7 @@ org: nghiep-pham-ecosys
 repos:
   - { name: ecosys,                 path: .,                                 visibility: public,  area: ecosys,  default_branch: main }
   - { name: .github,                path: meta/.github,                      visibility: public,  area: ecosys,  default_branch: main }
+  - { name: tmpl-project,           path: meta/tmpl-project,                 visibility: public,  area: ecosys,  default_branch: main }
   - { name: ops,                    path: private/ops,                       visibility: private, area: ecosys,  default_branch: main }
   - { name: vault,                  path: private/vault,                     visibility: private, area: profile, default_branch: main }
   - { name: lab-to-prod,            path: projects/lab-to-prod,              visibility: public,  area: content, default_branch: main }
