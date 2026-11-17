@@ -1,6 +1,6 @@
 # ADR 0005: Template first, and the lab portfolio
 
-- **Status:** Accepted (Nghiep, 2026-11-17)
+- **Status:** Accepted (Nghiep, 2026-11-17); section 5 is completed by ADR 0006 (routine budget)
 - **Date:** 2026-11-17
 - **Amends ADR 0004:**
   - decision 4;
@@ -113,7 +113,8 @@
   - the rest across the other active labs.
 - Build work counts against agent hours (Claude Code sessions), not against Nghiep's hours.
 - This ADR adds no cloud routine for `ai-engineering-lab` or `eng-analytics-lab`.
-  - ADR 0006 (Claude Code drives the work, Claude Chat reports) sets the routine budget.
+  - ADR 0006 (Claude Code drives the work, Claude Chat reports) sets the routine budget: at most two repo routines,
+    none for `ai-engineering-lab` or `eng-analytics-lab` (ADR 0006 §3).
   - Each new routine needs Nghiep's yes.
   - The Tuesday and Friday 07:00 routine in ADR 0004 is withdrawn until then.
 - `platform-lab` runs in local sessions only.

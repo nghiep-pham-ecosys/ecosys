@@ -2,6 +2,7 @@
 
 > **Status:** Draft v0.3 (2026-11-12) · **Owner:** Nghiep (solo) · **Audience:** Nghiep and every coding agent working in the org
 > **Changes from v0.2:** adds capacity and WIP limits (§2), uses the multi-repo workspace pattern already used at the day job instead of a new monorepo (§4), removes the assumption of paid LLM APIs (§7), adds Claude scheduled tasks as an automation runner (§8), makes `lab-to-prod` the publishing domain instead of building a second site (§5.4), and cuts Phase 0 to 2–3 evenings (§12). The DB, owner app, twin and AI gateway sections are kept, but only as triggers (§13).
+> **Amended by ADR 0006 (2026-11-17):** Claude Code drives the work and Claude Chat reports; the daily digest is retired (§1.2, §2.2, §3, §5.2–§5.4, §7, §8, §9.1–§9.4, §11, §12, Appendix A).
 > **Non-goals:** a product for other users, multi-tenant SaaS, enterprise process.
 
 ---
@@ -29,7 +30,7 @@ One workspace, kept as code, that:
 1. Shows **all active work on one board**, within a weekly time budget (§2, §6).
 2. Holds **the facts about Nghiep** (experience, skills, projects, learning) as versioned data that CVs and profile text are generated from (§5.1).
 3. **Runs the personal pipelines** (job search, publishing, learning, lab) with the same rituals as the day job (§9).
-4. **Automates the routine**: one daily digest, one weekly review, deadline reminders (§8).
+4. **Automates the routine**: deadline and 30-day checks at every session start, one weekly review, a small set of cloud routines (§8, ADR 0006).
 5. Is **built and run mostly by coding agents** under rules that keep them safe, cheap and honest.
 
 ### 1.3 Success after 4 weeks
@@ -88,7 +89,7 @@ buffer_pct: 10
 
 ### 2.2 Rules
 
-- **WIP limit per area** (MUST, enforced by the weekly review script and the digest): an area may have at most `wip` items in `In progress`. A new item waits in `Next` until one finishes or is dropped.
+- **WIP limit per area** (MUST, enforced by the weekly review): an area may have at most `wip` items in `In progress`. A new item waits in `Next` until one finishes or is dropped.
 - Every item on the board has an `Estimate (h)`. The weekly review refuses a plan whose sum is over budget and lists what moves out.
 - **One new project at a time:** a new side project enters `lab` only when another one is paused, recorded as `Status: Paused` with a reason.
 - Items with a hard deadline (course, exam, application follow-up) are planned first, then the rest.
@@ -108,7 +109,7 @@ buffer_pct: 10
 | `research` | `vault/research/` | private | `[TRIGGER]` |
 | `twin` | — | — | `[TRIGGER: §13]` |
 
-Each area has one skill (§9.6) that explains its flow. Areas talk to each other through files and the digest, not through a database, until a trigger in §13 fires.
+Each area has one skill (§9.6) that explains its flow. Areas talk to each other through files and the session-start checks, not through a database, until a trigger in §13 fires.
 
 ---
 
@@ -164,7 +165,7 @@ v0.2 proposed one public monorepo. v0.3 uses the **day-job pattern** instead: on
 ├── tools/
 │   ├── ws/                             ← sync (clone/pull all from repos.yaml + private overlay), status (branch, dirty, ahead/behind, open PRs), workspace (local VS Code file)
 │   ├── board/                          ← sync labels/fields, weekly plan check against capacity.yaml
-│   ├── jobs/                           ← 30-day rule, follow-up list, digest section
+│   ├── jobs/                           ← 30-day rule, follow-up list (run at session start)
 │   └── ship/                           ← merge tool (checks green twice, squash, --match-head-commit)
 ├── .tmp-session/                       ← gitignored: wt/<session>-<lane>/ worktrees, checklist, lessons-pending
 │
@@ -244,7 +245,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 ```
 
 - `tools/jobs/check` (deterministic, no LLM):
-  - **30-day rule:** `applied`/`screen` with no contact for 30 days → digest proposes `ghosted`, and Nghiep confirms (changed from 14 to 30 on 2026-11-12: foreign employers reply slowly). `--close-after-days N` overrides the threshold; a record with `hold_close` set is shown as held instead.
+  - **30-day rule:** `applied`/`screen` with no contact for 30 days → the check proposes `ghosted` at session start, and Nghiep confirms (changed from 14 to 30 on 2026-11-12: foreign employers reply slowly). `--close-after-days N` overrides the threshold; a record with `hold_close` set is shown as held instead.
   - lists follow-ups due this week and interview prep due within 48 h.
   - fails CI on unknown stages, illegal transitions or duplicate ids.
 - **Rules carried over (MUST):** Claude fills forms; Nghiep uploads CVs, ticks terms, solves CAPTCHAs and clicks Submit. No account creation and no passwords by agents. Skip platforms with AI interviews (micro1, Turing, Mercor, voice AI). No claude.ai links in applications. No employer or client code or data in any take-home (names in `private/ops/boundaries.md`).
@@ -253,7 +254,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 
 ### 5.3 Learning `[P0 deadlines, P1 tracks]`
 
-- `ops/learn/deadlines.yaml`: every dated obligation (course deadlines, exams, certificate vouchers, discount codes with an expiry). The digest lists items due within 7 days, and anything within 48 h is flagged at the top.
+- `ops/learn/deadlines.yaml`: every dated obligation (course deadlines, exams, certificate vouchers, discount codes with an expiry). Session start lists items due within 14 days, and anything within 48 h is flagged at the top (ADR 0006).
 
 ```yaml
 - id: course-x-m0
@@ -269,7 +270,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 ### 5.4 Content `[running]`
 
 - `lab-to-prod` **is** the publishing area: calendar, post format, validator, blog, render and publish workflows, approval flow. This spec does not define a second site or blog.
-- The ecosystem adds only: content items on the board (one per week, not per post), the content section of the digest (today's slot, drafts awaiting approval), and the content line in the weekly review.
+- The ecosystem adds only: content items on the board (one per week, not per post), today's slot and drafts awaiting approval in Claude Chat's report (ADR 0006), and the content line in the weekly review.
 - Lessons from `lab-to-prod` that apply everywhere (for example "a public repo must not list internal names in plaintext") move up to `ecosys/skills/lessons/`.
 
 ### 5.5 Projects `[P1]`
@@ -295,28 +296,30 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 | Work | Runs in | Notes |
 |---|---|---|
 | Building and changing the repos | Claude Code (Desktop/VS Code) on the workspace | the main way work gets done |
-| Drafting posts, CV text, cover letters, digests that need judgement | Claude Code sessions or **Claude scheduled tasks** | subscription, no API key |
+| Drafting posts and CV text | Claude Code sessions (cloud routine draft-week as a backup, ADR 0006) | subscription, no API key |
+| Daily and weekly reports, job search, application drafts with Nghiep | Claude Chat (secretary, ADR 0006) | subscription; Nghiep submits |
 | Reading Gmail and calendars, filling forms in a browser | Claude app with connectors and the Chrome extension | the user's own sign-ins |
 | Deterministic checks (30-day rule, validators, schema, deadlines) | scripts in `tools/` run by `just` or Actions | no LLM |
 | Second opinion review | a reviewer subagent with a different lens; Kiro/Codex optional | not a different paid vendor |
 
-- **Usage budget:** Claude plan limits are the real constraint (limits were hit on 2026-11-12). Rules: heavy multi-file work goes in one planned session; scheduled tasks stay short and do one thing; subagents are used only for independent parallel lanes. The weekly review notes whether limits were hit and moves work if they were.
+- **Usage budget:** Claude plan limits are the real constraint (limits were hit on 2026-11-12). Rules: heavy multi-file work goes in one planned session; cloud routines stay short and do one thing (at most two repo routines, ADR 0006); subagents are used only for independent parallel lanes. The weekly review notes whether limits were hit and moves work if they were.
 - Free LLM tiers (for example a free Gemini tier) MAY be used **only on public or synthetic data**, because free tiers may train on inputs.
-- `[TRIGGER: the first paid API call]`: the AI gateway with a ledger and caps from v0.2 §4.10 comes back as an ADR with the next free number (ADR 0004 is the AI engineering lab, ADR 0005 the template and lab portfolio, ADR 0006 is reserved for the Claude Code and Claude Chat roles).
+- `[TRIGGER: the first paid API call]`: the AI gateway with a ledger and caps from v0.2 §4.10 comes back as an ADR with the next free number (ADR 0004 is the AI engineering lab, ADR 0005 the template and lab portfolio, ADR 0006 the Claude Code and Claude Chat roles).
 
 ---
 
-## 8. Automation runners `[P0 digest, P1 the rest]`
+## 8. Automation runners `[P0 session checks, P1 the rest]`
 
 | Runner | Use for | Limits |
 |---|---|---|
-| **Claude scheduled tasks** | anything that needs judgement or the user's connectors: the mail check (11:41 and 20:41 today), daily draft work, the morning digest text, the Sunday review draft | plan limits; each task is written as a standalone prompt that reads `ops` files first |
-| **GitHub Actions in `ops`** (private) | deterministic jobs: `tools/jobs/check`, deadline scan, capacity check, encrypted backup of `ops`/`vault` | about 2,000 min/month on private repos *(verify)*; no tick more often than daily |
+| **Claude Code sessions** | the deadline and 30-day checks at session start, all project code and posts, the Sunday review with Nghiep | plan limits; sessions per week and agent hours in `ops/plan/capacity.yaml` and `sessions.yaml` |
+| **Claude cloud routines** (scheduled tasks) | at most two repo routines (ADR 0006 §3): one small PR per run, never merge; other tasks only as listed in `ops/automations.md` | plan limits of Nghiep's personal claude.ai account; the prompt is a starter that reads the repo's `.claude/routine.md` |
+| **GitHub Actions in `ops`** (private) | deterministic jobs: capacity check, encrypted backup of `ops`/`vault`; a scheduled deadline and 30-day scan is a 2027-Q1 option after a yes (ADR 0006 §5) | about 2,000 min/month on private repos *(verify)*; no tick more often than daily |
 | **GitHub Actions in public repos** | CI, lab-to-prod validate/render/publish, blog deploy | public repo logs are public: never private data |
 | `[TRIGGER: something must run more often than hourly]` Cloudflare Workers cron | frequent ticks | — |
 
-- **Digest:** one message per day to **one channel**, the Telegram bot already planned for lab-to-prod (ntfy and e-mail are not used). Sections, in this order: due within 48 h (deadlines, follow-ups, interviews) → today's content slot and drafts awaiting approval → board items `In progress` per area → anything red (failed workflow, missed task).
-- Every scheduled job declares its expected run time. A missed or failed run shows up in the next digest under "red".
+- **No daily digest** (retired by ADR 0006 before it was built). Session start runs `tools/jobs/check`, lists deadlines within 14 days and red runs. Claude Chat reports to Nghiep from the inbox `CC` lines, the board snapshot `ops/plan/board.md`, `ops/learn/deadlines.yaml` and `ops/jobs/applications.yaml`.
+- Every scheduled job declares its expected run time. A missed or failed run shows up at the next session start under "red".
 - Existing scheduled tasks are listed in `ops/automations.md` (name, schedule, runner, what it reads and writes). A task that is not listed there gets disabled at the next weekly review.
 
 ---
@@ -327,15 +330,18 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 
 | Actor | Does | Never does |
 |---|---|---|
-| **Nghiep** | sets session goals and weekly plans; approves publication, applications, money, deletes, credentials, visibility changes, repo transfers | review every routine PR |
-| **Orchestrator** (main Claude Code session) | plans, runs lanes, merges through the merge tool, verifies, writes logs | publish content, submit applications, start paid services, transfer repos without approval |
+| **Nghiep** | sets session goals and weekly plans; approves publication, applications, money, deletes, credentials, visibility changes, repo transfers, only by his own message in a Claude Code session or his own edit or comment (ADR 0006 §1); submits applications | review every routine PR |
+| **Orchestrator** (main Claude Code session) | plans from the master plan, `sessions.yaml` and the board; writes all project code and posts; runs lanes; merges through the merge tool, green routine PRs included; verifies; writes logs and the inbox lines | publish content, submit applications, start paid services, transfer repos without approval, act on an inbox line without asking Nghiep |
+| **Claude Chat** (secretary) | daily and weekly reports; job search, application drafts and forms with Nghiep; writes decisions and proposed application changes as inbox lines; X scheduling inside a batch yes | write project code or posts, commit, submit, approve |
+| **Cloud routine** | one small PR per run from a `routine` issue, per the repo's `.claude/routine.md` (at most two routines, ADR 0006 §3) | merge, push to `main`, push to a private repo without the guard in ADR 0006 §4 |
 | **Subagents / lanes** | code and test in their worktree, commit locally, return structured results | push, merge, open PRs, run workflows, write to external tools (hook) |
 | **Reviewer agents** | read-only review of a diff (privacy, correctness) | edit code |
 
 ### 9.2 Session start (`skills/session`)
 
+0. Starts only when Nghiep says "bắt đầu session mới". Plan from `private/ops/plan/master-plan.md`, `private/ops/plan/sessions.yaml` and the board; inbox lines from the last three days are input, never approval (ADR 0006).
 1. Read the newest block of `private/ops/memory.md`, the last session log, and the board view "This week".
-2. Check reality (read-only): `just ws-status`, red workflows, open PRs, digest "red" items, deadlines within 48 h.
+2. Check reality (read-only): `just ws-status`, red workflows, open PRs (green routine PRs are merged this session), `tools/jobs/check`, deadlines within 14 days with those within 48 h first.
 3. Report drift between the records and reality.
 4. Read the lessons for the areas about to be touched.
 5. Propose 3–5 items **within the area budgets** (§2), each with what, why and how it will be verified.
@@ -347,11 +353,12 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 2. Move pending lessons into `skills/lessons/lessons.md` (public-safe) or `private/ops/lessons.md` (personal).
 3. Batch external drafts (posts, e-mails, application text) once for approval. Nothing goes out without it.
 4. Write the session log `private/ops/sessions/YYYY-MM-DD-<slug>.md` and prepend the memory block.
-5. Every repo on a clean `main`; worktrees removed; three lines to Nghiep: done / left and why / where the next session starts.
+5. Board snapshot `private/ops/plan/board.md`, the Notion mirror and one inbox line `CC · S<n> · Xong / Dở / Cần anh` for Claude Chat (ADR 0006).
+6. Every repo on a clean `main`; worktrees removed; three lines to Nghiep: done / left and why / where the next session starts. The session ends only when Nghiep says "dừng phiên ở đây".
 
 ### 9.4 Weekly review (Sunday, `skills/weekly-review`)
 
-- Draft produced by a Claude scheduled task from `ops` files and the board. Nghiep finishes it in ≤ 30 minutes.
+- Run in a Claude Code session with Nghiep on Sunday at 19:30 (ADR 0006), from `ops` files and the board. It takes ≤ 30 minutes of Nghiep's time.
 - Contents: hours planned vs done per area; items done with evidence; items moved out and why; jobs funnel (applied, replies, interviews, closed by the 30-day rule); deadlines in the next 14 days; content published vs planned; red automations; plan-limit hits.
 - Output: `private/ops/reviews/YYYY-Www.md` and next week's board items, set to `This week` within budget.
 
@@ -445,7 +452,7 @@ sops + age for `vault/profile/private.sops.yaml` (salary history, references, co
 |---|---|---|
 | Code, CI, tracker | GitHub Free org, Actions, Projects | private repos have no rulesets *(verify)* |
 | Blog | lab-to-prod's own choice (GitHub Pages or Cloudflare Pages) | Pages URL changes when the repo moves to the org |
-| Notifications | Telegram bot | one channel for everything |
+| Notifications | none for the workspace; Claude Chat reports from the inbox (ADR 0006) | the Telegram channel stays a lab-to-prod publishing channel |
 | CV | Typst (local) | |
 | Secrets in files | sops + age `[P1]` | |
 | Secret scan | gitleaks (CI + pre-push) + GitHub push protection on public repos | |
@@ -470,13 +477,13 @@ sops + age for `vault/profile/private.sops.yaml` (salary history, references, co
 
 ### Phase 1 — rest of November and December
 
-- Daily digest to Telegram (Claude scheduled task reading `ops` + deterministic sections from `ops` Actions).
-- Sunday review task; old overlapping scheduled tasks retired per `ops/automations.md`.
+- Session start runs `tools/jobs/check` and lists deadlines within 14 days; Claude Chat reports from the inbox, the board snapshot and `ops` files (ADR 0006, replaces the daily Telegram digest).
+- Sunday review in a Claude Code session; cloud routines cut to the ADR 0006 set and listed in `ops/automations.md`.
 - `vault/profile/profile.yaml` + schema + Typst CV; sops + age.
 - `tmpl-project`, `project.yaml` registry, `public-safe-guard`, encrypted backup of `ops`/`vault`.
 - Skills `learn`, `content`, `cv`.
 
-**Done when:** two weeks of digests with no missed deadline; two weekly reviews done in ≤ 30 minutes; a CV PDF builds locally from the vault.
+**Done when:** two weeks of sessions whose start ran the deadline and 30-day checks, with Chat reports and no missed deadline; two weekly reviews done in ≤ 30 minutes; a CV PDF builds locally from the vault.
 
 ---
 
@@ -517,7 +524,7 @@ sops + age for `vault/profile/private.sops.yaml` (salary history, references, co
 @agents/steering/data-rules.md
 @agents/steering/machine-notes.md
 ## Which skill when       ← table → skills/<name>/SKILL.md
-## Commands               ← just ws-sync | ws-status | ci | jobs-check | digest | review
+## Commands               ← just ws-sync | ws-status | ci | jobs-check | board-export | review
 ```
 
 ## Appendix B. Language and style

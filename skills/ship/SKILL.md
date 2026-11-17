@@ -60,10 +60,11 @@ Only through `tools/ship/merge` (raw `gh pr merge` is denied in settings and blo
 Run `tools/ship/merge --help` for its arguments. If it refuses, fix the cause; never work around it.
 A repo whose checks are not named `ci-result` and `pr-title` needs `--require <its check names>`.
 
-**When to merge (Nghiep, 2026-11-16).** A PR opened in a session with Nghiep (Claude Code or Claude Chat) is merged
-in that same session as soon as it is green. No PR is left open at the end of such a session. Cloud routines open PRs
-and never merge them. Routine PRs, and any PR a session could not merge (red, blocked, waiting on a decision), wait
-for the weekly review on Sunday at 19:30. There is no daily PR review block.
+**When to merge (ADR 0006).** A PR opened in a Claude Code session is merged in that same session as soon as it is
+green. No PR is left open at the end of a session. Cloud routines open PRs and never merge them. The next local
+session merges each green routine PR after reading its diff; a routine PR that changes public text (docs, a README, a
+post) gets a reviewer-privacy pass first. A red routine PR, and any PR a session could not merge (red, blocked,
+waiting on a decision), waits for the weekly review on Sunday at 19:30. There is no daily PR review block.
 
 **Push from the repo's own clone** (`git -C <repo> push -u origin <branch>`). The ship guard treats any command that
 runs inside, or `git -C`s into, `.tmp-session/wt/` as a lane call and blocks the push.
@@ -75,6 +76,7 @@ force push, no deletion.
 
 - the committed pre-push hook (`.githooks/pre-push`, enabled with `git config core.hooksPath .githooks`) that runs
   gitleaks. Check `git -C <repo> config core.hooksPath` prints `.githooks` before the first push. No hook → no push.
+  A cloud routine follows the exception in ADR 0006 §4 instead (CI gitleaks, or hook and gitleaks inside the run).
 - a CI workflow with jobs `ci-result` and `pr-title` (copy `ops/.github/workflows`). The merge tool refuses a PR
   with no checks at all.
 - the same PR flow and `tools/ship/merge` as public repos. Direct pushes to `main` are not used, even though GitHub

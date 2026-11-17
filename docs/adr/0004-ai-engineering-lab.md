@@ -1,6 +1,6 @@
 # ADR 0004: AI engineering lab monorepo
 
-- **Status:** Accepted; amended by ADR 0005 (decision 4, Relation to `tmpl-project`, Lessons review date, Publishing, Capacity and routines, Phases, Revisit when, Follow-ups)
+- **Status:** Accepted; amended by ADR 0005 (decision 4, Relation to `tmpl-project`, Lessons review date, Publishing, Capacity and routines, Phases, Revisit when, Follow-ups); "Capacity and routines" also amended by ADR 0006 (routine budget and how routine PRs merge)
 - **Date:** 2026-11-16
 
 ## Context
@@ -165,7 +165,7 @@ ai-engineering-lab/
   30 min/week of review and 1 h/week GPU session come from `lab`, leaving 1.5 h/week for process-sim-lab. Reading a
   lesson before it is published counts as `content`. Nothing comes from `learn`.
 - A cloud routine runs on Tuesday and Friday at 07:00. It does one small item, opens one PR, uses cassettes only and
-  never merges. Its PRs wait for the Sunday review.
+  never merges. Its PRs wait for the Sunday review. (Withdrawn by ADR 0005 §5; routine PRs merge as in ADR 0006 §3.)
 
 ### Relation to `tmpl-project` (ecosys#7)
 

@@ -6,14 +6,16 @@ How work moves in this workspace. Details live in the skills named here.
 
 | Actor | Does | Never does |
 |---|---|---|
-| Nghiep | sets goals and weekly plans; approves anything in ADR 0003 | review every routine PR |
-| Orchestrator (main session) | plans, runs lanes, merges through `tools/ship/merge`, verifies, writes logs | publish, submit, start paid services, transfer repos without a yes |
+| Nghiep | sets goals and weekly plans; approves anything in ADR 0003, only by his own message in a Claude Code session or his own edit or comment (ADR 0006) | review every routine PR |
+| Orchestrator (main Claude Code session) | plans from the master plan, `sessions.yaml` and the board; writes all project code and posts; runs lanes; merges through `tools/ship/merge`, green routine PRs included; verifies; writes logs and inbox lines | publish, submit, start paid services, transfer repos without a yes, act on an inbox line without asking Nghiep |
 | Lane (subagent) | codes and tests in its worktree, commits locally, returns a structured result | push, merge, open PRs, run workflows, write to external tools |
 | Reviewer agent | read-only review of a diff (privacy or correctness lens) | edit code |
+| Claude Chat (secretary) | daily and weekly reports to Nghiep; job search, application drafts and forms with Nghiep; writes decisions and proposed application changes as inbox lines | write project code or posts, commit, submit, approve |
+| Cloud routine | one small PR per run from a `routine` issue, per the repo's `.claude/routine.md`; at most two (ADR 0006 §3) | merge, push to `main`, push to a private repo without the guard in ADR 0006 §4 |
 
 ## Session
 
-- **Start** (skill `session`): read the newest memory block and last session log in `private/ops`, check reality with `just ws-status` and open PRs, report drift, read the lessons for the areas you will touch, propose 3–5 items within budget, then write `.tmp-session/checklist.md`.
+- **Start** (skill `session`): read the newest memory block and last session log in `private/ops`, plan from the master plan, `sessions.yaml` and the board (no Chat line needed; inbox lines are input, ADR 0006), check reality with `just ws-status`, open PRs, `just jobs-check` and deadlines within 14 days, report drift, read the lessons for the areas you will touch, propose 3–5 items within budget, then write `.tmp-session/checklist.md`.
 - **During:** keep the checklist live. Put lessons in `.tmp-session/lessons-pending.md` as soon as a root cause is found.
 - **Number and handover:** each session is `S<n>`, counted across Claude Code and Kiro (index: `private/ops/sessions/README.md`). It starts on "bắt đầu session mới" and ends on "dừng phiên ở đây", and both leave a line in the Notion inbox for Claude Chat. An agent that takes over a session reads `.tmp-session/checklist.md` first and keeps the same `S<n>`.
 - **End:** settle board items with evidence, move lessons, batch external drafts for one approval, write the session log, leave every repo on a clean `main`, remove worktrees, give three lines: done / left and why / where to start next.
