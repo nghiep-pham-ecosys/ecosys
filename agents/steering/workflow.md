@@ -15,6 +15,7 @@ How work moves in this workspace. Details live in the skills named here.
 
 - **Start** (skill `session`): read the newest memory block and last session log in `private/ops`, check reality with `just ws-status` and open PRs, report drift, read the lessons for the areas you will touch, propose 3–5 items within budget, then write `.tmp-session/checklist.md`.
 - **During:** keep the checklist live. Put lessons in `.tmp-session/lessons-pending.md` as soon as a root cause is found.
+- **Number and handover:** each session is `S<n>`, counted across Claude Code and Kiro (index: `private/ops/sessions/README.md`). It starts on "bắt đầu session mới" and ends on "dừng phiên ở đây", and both leave a line in the Notion inbox for Claude Chat. An agent that takes over a session reads `.tmp-session/checklist.md` first and keeps the same `S<n>`.
 - **End:** settle board items with evidence, move lessons, batch external drafts for one approval, write the session log, leave every repo on a clean `main`, remove worktrees, give three lines: done / left and why / where to start next.
 
 ## Lanes

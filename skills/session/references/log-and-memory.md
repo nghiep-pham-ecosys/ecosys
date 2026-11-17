@@ -6,10 +6,11 @@ content may be in Vietnamese. Headings stay as below so tools and later sessions
 ## Session log
 
 Path: `private/ops/sessions/YYYY-MM-DD-<slug>.md`. `<slug>` is 2–4 lowercase words joined by hyphens. Two sessions on
-the same day get different slugs. Add one line to `private/ops/sessions/README.md` (date, slug, title).
+the same day get different slugs. Add one line to `private/ops/sessions/README.md` (number, date, slug, agent, title).
+The number `S<n>` is the one in the live checklist (`session`, "Session number and handover").
 
 ```markdown
-# <YYYY-MM-DD> <title>
+# S<n> · <YYYY-MM-DD> <title>
 
 Agent: <Claude Code | Claude app | Kiro> · Where: <machine / editor> · Duration: <h>
 
@@ -48,7 +49,7 @@ Prepend to `private/ops/memory.md`, newest first. **Prepend only.** Agents never
 Nghiep archives them by hand.
 
 ```markdown
-## <YYYY-MM-DD> <slug> (<agent> — <where>): <short title>
+## S<n> · <YYYY-MM-DD> <slug> (<agent> — <where>): <short title>
 **Nghiep's decisions** — only what Nghiep said
 **Results** — items, PRs, evidence
 **State at end** — from the end-of-session check, with the date and time
