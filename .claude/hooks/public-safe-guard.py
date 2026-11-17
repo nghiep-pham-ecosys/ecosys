@@ -256,7 +256,7 @@ def check_file_tool(payload, terms, project, cwd):
     if not name:
         return None
     what = "the text written to" if in_text else "the name of"
-    return f"{what} {mask(path, terms)} (public repo {name}) holds a term from the local denylist; {HOW}"
+    return f"{what} {mask(path, terms)} (public repo {mask(name, terms)}) holds a term from the local denylist; {HOW}"
 
 
 # ---------------------------------------------------------------- Bash
@@ -322,7 +322,7 @@ def check_bash(payload, terms, project, cwd):
                     name = public_file(path, manifest)
                     if name:
                         return (f"this command holds a term from the local denylist and writes "
-                                f"{mask(path, terms)} in public repo {name}; {HOW}")
+                                f"{mask(path, terms)} in public repo {mask(name, terms)}; {HOW}")
         parts = g.git_parts(core)
         if parts and str(parts[0]) in GIT_TEXT_SUBS:
             dirs = [g.expand_path(str(d), f, project, home) for d in parts[2] for f in folders] or folders
@@ -330,13 +330,13 @@ def check_bash(payload, terms, project, cwd):
                 vis, _root, name = repo_of(d, manifest)
                 if vis == "public":
                     return (f"this command holds a term from the local denylist and runs git {parts[0]} "
-                            f"in public repo {name}; {HOW}")
+                            f"in public repo {mask(name, terms)}; {HOW}")
         gh = g.gh_parts(core)
         if gh:
             name = _gh_target(core, gh, folders, manifest)
             if name:
                 return (f"this command holds a term from the local denylist and sends text to "
-                        f"public repo {name} with gh; {HOW}")
+                        f"public repo {mask(name, terms)} with gh; {HOW}")
     return None
 
 

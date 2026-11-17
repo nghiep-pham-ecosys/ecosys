@@ -170,6 +170,17 @@ class PublicSafeGuardTest(unittest.TestCase):
         git("init", "-q", bare)
         self.blocked(project=bare, cwd=bare, **self.write(os.path.join(bare, "x.md"), TERM))
 
+    def test_missing_manifest_masks_term_in_gh_repo_name(self):
+        bare = os.path.join(self.tmp, "no-manifest")
+        os.makedirs(bare, exist_ok=True)
+        for command in ("gh issue create -R example-org/globex-internal --title x --body y",
+                        "gh issue create --repo=example-org/Globex-Internal --title x --body y",
+                        "gh api -X POST repos/example-org/globex-internal/issues -f title=x"):
+            with self.subTest(command=command):
+                err = self.blocked("main-bash", project=bare, cwd=bare, command=command)
+                self.assertNotIn("globex-internal", err.lower(), "a block must never print the term")
+                self.assertIn("***", err)
+
     def test_other_tools_pass(self):
         self.allowed("main-read", tool_input={"file_path": self.p("docs/notes.md")})
 
