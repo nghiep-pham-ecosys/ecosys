@@ -99,7 +99,10 @@ Account:
 - The cloud routines and Claude Chat belong to Nghiep's personal claude.ai account.
 - Routines are listed and changed only from a Claude Code client signed into that account. The client shows only the
   routines of the account it is signed into.
-- Personal work never runs on an account issued by an employer (spec §10.3).
+- Personal work never runs on an account issued by an employer (spec §10.3), with one exception (Nghiep,
+  2026-11-18): local Claude Code sessions may use a Claude Team seat that the day job pays for, for heavy coding.
+  The cloud routines and Claude Chat stay on the personal account. The spec §10.3 boundary still holds: no day-job
+  code, data, repo or connector is used in these sessions, and nothing from the day job comes into this workspace.
 - The kept routines need GitHub access only. draft-week drops its Notion connector.
 
 Merging routine PRs:
@@ -183,6 +186,8 @@ The daily digest (spec §8, Phase 1) is dropped before it was built. Its jobs mo
 
 - **2026-11-17, about 18:00:** Claude Code drives the work, without going through Claude Chat.
 - **2026-11-17, evening:** approved the master plan and the routine redesign, every proposal included.
+- **2026-11-18 (S10):** local sessions may run on the Claude Team seat (section 3, "Account"); the routines and Chat
+  stay on the personal account, so routine prompts are changed on claude.ai or from a client signed into it.
 - Acceptance of this ADR needs Nghiep's own yes in a Claude Code session (section 1).
 
 ## Follow-ups
