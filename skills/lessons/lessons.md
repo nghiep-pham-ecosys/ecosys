@@ -235,8 +235,8 @@ _No entries yet._
 ## Public-safe and privacy
 
 ### Strip claude.ai session links from routine PRs before the merge
-- Why: the first cloud-routine PR (process-sim-lab#18) carried a `Claude-Session: https://claude.ai/...` commit
-  trailer and a footer with the same link, and was opened as a draft → the cloud client adds them by default and
+- Why: the first cloud-routine PR (process-sim-lab#18) carried a `Claude-Session:` commit trailer with a session URL
+  and a footer with the same link, and was opened as a draft → the cloud client adds them by default and
   the routine instructions did not forbid them.
 - How: before merging a routine PR in a public repo, read the body and commits for `claude.ai/`; edit the body
   (the squash message is the PR body in these repos, so `main` stays clean); mark a draft ready. The branch commit
