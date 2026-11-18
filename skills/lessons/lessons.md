@@ -14,6 +14,13 @@ to `guards.md` in the same PR.
 - Seen: workspace session 1 (brand lane), 2026-11
 - Guard: ritual step in the lane brief template (skills/core/references/issue-and-brief.md)
 
+### Copy a lane's test command from the repo README or CI
+- Why: a brief composed `unittest discover -s <abs>/tests -t <abs-root>`, which fails in a repo whose `tests/` has
+  no `__init__.py` → the command was written from memory, not taken from the repo.
+- How: paste the test command exactly as the README or the CI workflow runs it, with `cd <worktree>` in a subshell.
+- Seen: process-sim-lab lane, 2026-11-18
+- Guard: none yet; candidate: the brief template's `Test:` line says "copied from README or CI"
+
 ### Check which Notion workspace a session reaches before the first Notion call
 - Why: at session start the inbox page returned 404 and no routines were listed → the client was signed into another
   claude.ai account, and a claude.ai connector (and the routine list) follows that account; one Notion connection
@@ -34,7 +41,9 @@ to `guards.md` in the same PR.
 - Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path);
   ops#30, 2026-11-16 (`git -C` into the worktree for the push); ops#40, 2026-11-16 evening (a push in the same
   command line as a worktree path, and `gh issue create` from a shell left in a worktree); lab-to-prod#33 and
-  process-sim-lab#7, #8, 2026-11-17 (push or merge chained with a worktree command, 4 blocks); S9 2026-11-18 (ops#54 and vault#3: `cd` into the lane worktree in the same command as the push)
+  process-sim-lab#7, #8, 2026-11-17 (push or merge chained with a worktree command, 4 blocks); S9 2026-11-18 (ops#54 and vault#3: `cd` into the lane worktree in the same command as the push); S10
+  2026-11-18 (4 blocks: `cd` into a worktree for `just ci`, then a push; a commit and a push in one line; `gh project
+  item-edit` in one line with a worktree commit; `git log` of worktrees in one line with `tools/ship/stack-merge --help`)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ### Check the repo before building what an issue says is missing
@@ -124,8 +133,11 @@ _No entries yet._
   PR to `main` before each merge, merges through `tools/ship/merge`, updates the next branch on GitHub and waits for
   its checks. By hand, the same order applies; with gh 2.45 use `gh api -X PATCH repos/<o>/<r>/pulls/<n> -f base=main`
   (`gh pr edit --base` fails on a Projects-classic field).
+- After a squash merge, the next branch still carries the bottom commit and can conflict with its squashed copy on
+  `main`; `stack-merge` stops there. Without a force-push that Nghiep named, cherry-pick the top commit onto a new
+  branch from `main`, open it as a new PR and close the old one.
 - Seen: lab-to-prod stack #1–#8, 2026-11; lab-to-prod#41–#44, 2026-11-17 (four manual steps per PR, two merge
-  conflicts and a worktree push block)
+  conflicts and a worktree push block); process-sim-lab#20–#21, 2026-11-18 (conflict after the squash; #22 replaced #21)
 - Guard: tool `tools/ship/stack-merge` (test tools/ship/tests/test_stack_merge.py); skills/ship §3 names it
 
 ### A recreated repository may not start Actions until its Actions permission is set again
@@ -175,6 +187,13 @@ _No entries yet._
 - Seen: 2026-11-13
 - Guard: lab-to-prod `publish/record_manual.py` + CLAUDE.md rule (lab-to-prod#13)
 
+### Record a manual X post with the time from its status id
+- Why: a manual record took `at` = the time of recording, so the 2026-11-17 post reads as posted a day late → the
+  tool defaults `--at` to now, and the post time was not known when the link arrived.
+- How: an X status id holds its time: `(id >> 22) + 1288834974657` ms since the epoch. Pass that as `--at`.
+- Seen: 2026-11-18 (S9 record of 2026-11-17; S10 recorded 2026-11-18 correctly)
+- Guard: none yet; candidate: `record_manual` derives `at` from an x.com status URL (after the 2026-12-13 freeze)
+
 ### Keep bot-written state off a protected branch
 - Why: the publish and metrics workflows pushed `published.json` and `metrics.csv` straight to `main`, but the main
   ruleset only accepts pull requests; a live run would have posted, failed to record it, and posted again on the
@@ -214,6 +233,17 @@ _No entries yet._
 - Guard: ci lab-to-prod publish.yml and blog.yml early crons plus `tools/wait_until.py` (lab-to-prod#33)
 
 ## Public-safe and privacy
+
+### Strip claude.ai session links from routine PRs before the merge
+- Why: the first cloud-routine PR (process-sim-lab#18) carried a `Claude-Session:` commit trailer with a session URL
+  and a footer with the same link, and was opened as a draft → the cloud client adds them by default and
+  the routine instructions did not forbid them.
+- How: before merging a routine PR in a public repo, read the body and commits for `claude.ai/`; edit the body
+  (the squash message is the PR body in these repos, so `main` stays clean); mark a draft ready. The branch commit
+  stays visible in the PR's commit list.
+- Seen: process-sim-lab#18, 2026-11-18
+- Guard: process-sim-lab `.claude/routine.md` §4 (process-sim-lab#19); candidate: a CI check that fails on
+  `claude.ai/` in a PR body or commit of a public repo
 
 ### A public file must not list the names it is meant to hide
 - Why: a banned-terms list and its tests held the protected names in plain text in a public repo, so the guard
@@ -285,6 +315,14 @@ _No entries yet._
   `git config user.email` in any workspace repo before the first commit on a new machine.
 - Seen: ecosys PR #36, 2026-11-16 (earlier PRs too)
 - Guard: none: external machine git config, outside the repos
+
+### zsh does not split a variable into words
+- Why: `set -- $spec` in a polling loop left `$2` empty under zsh, so the loop spun for 10 minutes on a usage
+  error → the agent shell is zsh, and zsh does not word-split unquoted parameters.
+- How: use `${=spec}`, `cut`, or `name:number` pairs split with `${s%%:*}` and `${s##*:}`. `mise exec -C <dir>`
+  also changes the working directory, so pass absolute file paths to it.
+- Seen: S10, 2026-11-18
+- Guard: none (this lesson)
 
 ### Read a scratch file before deleting it
 - Why: `.tmp-session/lessons-pending.md` was deleted after one entry was moved, without reading it first; any entry
