@@ -10,7 +10,7 @@ set tempdir := ".tmp-session/just"
 # python3 on PATH that can import yaml, then fall back to the system one.
 python := `for p in python3 /usr/bin/python3; do if command -v "$p" >/dev/null 2>&1 && "$p" -c 'import yaml' 2>/dev/null; then command -v "$p"; exit 0; fi; done; echo python3`
 
-test_dirs := ".claude/hooks/tests tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests tools/board/tests"
+test_dirs := ".claude/hooks/tests tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests tools/board/tests tools/cv/tests"
 
 # List the recipes
 default:
@@ -39,6 +39,14 @@ board-export *args:
 # Zip each skill into dist/skills/<name>.zip for upload to Claude (args: skill names, default all)
 skills-zip *args:
     {{python}} tools/skills/pack "$@"
+
+# Build a CV PDF from private/vault/profile/profile.yaml into private/vault/out (args: variant, e.g. ai-platform)
+cv variant *args:
+    @{{python}} tools/cv/cv build "$@"
+
+# Check the profile facts and list every number with its fact id (args: --variant NAME)
+cv-check *args:
+    @{{python}} tools/cv/cv check && {{python}} tools/cv/cv audit "$@"
 
 # Weekly review draft
 review:
