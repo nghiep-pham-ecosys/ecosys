@@ -5,8 +5,11 @@ content may be in Vietnamese. Headings stay as below so tools and later sessions
 
 ## Session log
 
-Path: `private/ops/sessions/YYYY-MM-DD-<slug>.md`. `<slug>` is 2–4 lowercase words joined by hyphens. Two sessions on
-the same day get different slugs. Add one line to `private/ops/sessions/README.md` (number, date, slug, agent, title).
+Path: `private/ops/sessions/YYYY-MM-DD-S<n>-nghiep-pham-ecosys.md` (Nghiep, 2026-11-18): the date, the session number and the
+fixed workspace name, so sessions on one day, and day-job sessions in another workspace, never share a name. The
+`<slug>` (2–4 lowercase words joined by hyphens) stays a short label in the checklist header, the index and the memory
+block heading; it is not part of the file name. Add one line to `private/ops/sessions/README.md` (number, date, slug,
+agent, title).
 The number `S<n>` is the one in the live checklist (`session`, "Session number and handover").
 
 ```markdown

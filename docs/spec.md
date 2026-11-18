@@ -352,7 +352,7 @@ Items marked `[UI]` are done by Nghiep in the GitHub web UI. Agents do not creat
 1. Settle board items (status, evidence link).
 2. Move pending lessons into `skills/lessons/lessons.md` (public-safe) or `private/ops/lessons.md` (personal).
 3. Batch external drafts (posts, e-mails, application text) once for approval. Nothing goes out without it.
-4. Write the session log `private/ops/sessions/YYYY-MM-DD-<slug>.md` and prepend the memory block.
+4. Write the session log `private/ops/sessions/YYYY-MM-DD-S<n>-nghiep-pham-ecosys.md` and prepend the memory block.
 5. Board snapshot `private/ops/plan/board.md`, the Notion mirror and one inbox line `CC · S<n> · Xong / Dở / Cần anh` for Claude Chat (ADR 0006).
 6. Every repo on a clean `main`; worktrees removed; three lines to Nghiep: done / left and why / where the next session starts. The session ends only when Nghiep says "dừng phiên ở đây".
 

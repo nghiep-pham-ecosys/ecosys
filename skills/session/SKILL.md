@@ -118,7 +118,7 @@ The log is written last, from checked facts, not from what the session remembers
    what was approved and sent, and what is still waiting.
 5. **Board snapshot.** Run `just board-export` (writes `private/ops/plan/board.md`, first line `snapshot: <time>`)
    so Claude Chat, which cannot read GitHub Projects, sees the board. It is committed with the session log.
-6. **Write** the session log `private/ops/sessions/YYYY-MM-DD-<slug>.md` and **prepend** the memory block to
+6. **Write** the session log `private/ops/sessions/YYYY-MM-DD-S<n>-nghiep-pham-ecosys.md` and **prepend** the memory block to
    `private/ops/memory.md`. Formats: [`references/log-and-memory.md`](references/log-and-memory.md).
 7. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`); the session's
    `.tmp-session` files deleted after their content is in the log. Commit `ops` changes through the normal flow.
