@@ -34,7 +34,7 @@ to `guards.md` in the same PR.
 - Seen: workspace session 1, 2026-11; 2026-11-13 (a commit-and-push one-liner that named the worktree path);
   ops#30, 2026-11-16 (`git -C` into the worktree for the push); ops#40, 2026-11-16 evening (a push in the same
   command line as a worktree path, and `gh issue create` from a shell left in a worktree); lab-to-prod#33 and
-  process-sim-lab#7, #8, 2026-11-17 (push or merge chained with a worktree command, 4 blocks)
+  process-sim-lab#7, #8, 2026-11-17 (push or merge chained with a worktree command, 4 blocks); S9 2026-11-18 (ops#54 and vault#3: `cd` into the lane worktree in the same command as the push)
 - Guard: hook ship-guard (blocks the push; this lesson explains the fix)
 
 ### Check the repo before building what an issue says is missing
@@ -243,6 +243,30 @@ _No entries yet._
 - How: edit such docs with Write/Edit or a script file.
 - Seen: ecosys#8, 2026-11-17
 - Guard: hook secret-path-guard (by design)
+
+### Branch from the session worktree itself, never after `cd` into the workspace root
+- Why: `cd <workspace root> && git checkout -b <branch>` from a Claude Code session worktree moved the main ecosys
+  checkout onto the new branch while the commit landed in the session worktree, so the first push sent an empty
+  branch → the root checkout and the session worktree are two working trees of the same repo.
+- How: in a session worktree, run `git checkout -b` in the session cwd with no `cd`; use `git -C <repo>` for any
+  other repo.
+- Seen: ecosys#53, 2026-11-18
+- Guard: none yet (candidate: worktree-guard warns on `checkout -b` in the workspace root from a session worktree)
+
+### Prove a concurrency test fails without the fix
+- Why: race tests often pass by luck; the mock-lock test in claude-for-everyone-vi#21 was trusted only after it
+  failed 3 of 3 runs with the lock removed (forced with `sys.setswitchinterval(1e-6)`).
+- How: revert the guard temporarily, run the test, restore it, and note the result in the lane summary.
+- Seen: claude-for-everyone-vi#21, 2026-11-18
+- Guard: lane habit; ask for it in the lane brief when the change is about threads
+
+### A child-repo lane worktree is not the session worktree
+- Why: the harness Write tool refused files under `.tmp-session/wt/<lane>` of a child repo because it took them for
+  the base checkout of the root repo; the lane had to write with Bash heredocs.
+- How: before writing another way, check that the path is the lane worktree named in the brief; write with Bash
+  there, never in the root checkout.
+- Seen: claude-for-everyone-vi#22 and vault#3, 2026-11-18
+- Guard: none yet (candidate: teach the hook about `.tmp-session/wt/` lanes)
 
 ## Data and tools
 
