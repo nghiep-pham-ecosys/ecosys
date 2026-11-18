@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Build a CV PDF from the private profile facts (spec §5.1).
+
+Usage:
+  tools/cv/cv check [--profile PATH]
+  tools/cv/cv audit [--profile PATH] [--variant NAME]
+  tools/cv/cv build VARIANT [--profile PATH] [--out DIR]
+
+check   validates ids, variant references and the number rule (every number inside a fact with an id).
+audit   prints every number with its fact id (only numbers the variant prints, with --variant).
+build   runs check, then renders tools/cv/cv.typ with Typst to <out>/cv-<VARIANT>.pdf.
+Defaults: --profile private/vault/profile/profile.yaml, --out private/vault/out (PDFs are gitignored there).
+Exit codes: 0 ok, 1 check failed, 2 bad arguments, unreadable profile or Typst error.
+Output names files and fact ids only, never profile text, so it is safe in a CI log.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import _cvlib  # noqa: E402
+
+ROOT = HERE.parent.parent
+DEFAULT_PROFILE = ROOT / "private/vault/profile/profile.yaml"
+DEFAULT_OUT = ROOT / "private/vault/out"
+TEMPLATE = HERE / "cv.typ"
+
+
+def typst_cmd() -> list[str]:
+    found = shutil.which("typst")
+    if found:
+        return [found]
+    mise = Path.home() / ".local/bin/mise"
+    if mise.exists():
+        return [str(mise), "exec", "--", "typst"]
+    raise _cvlib.ProfileError("typst not found (install it with mise)")
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(prog="tools/cv/cv", description=__doc__.split("\n")[0])
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    for name in ("check", "audit", "build"):
+        p = sub.add_parser(name)
+        p.add_argument("--profile", default=str(DEFAULT_PROFILE))
+        if name == "audit":
+            p.add_argument("--variant")
+        if name == "build":
+            p.add_argument("variant")
+            p.add_argument("--out", default=str(DEFAULT_OUT))
+    args = ap.parse_args(argv)
+    try:
+        profile = _cvlib.load(args.profile)
+    except _cvlib.ProfileError as exc:
+        print(f"cv: {exc}", file=sys.stderr)
+        return 2
+
+    errors = _cvlib.check(profile)
+    if args.cmd == "check" or errors:
+        for e in errors:
+            print(f"cv: error: {e}", file=sys.stderr)
+        if errors:
+            return 1
+        n = len(_cvlib.index(profile))
+        print(f"cv: ok · {n} facts · {len(profile['variants'])} variants · {len(_cvlib.numbers(profile))} numbers, all tied to a fact id")
+        return 0
+
+    if args.cmd == "audit":
+        rows = _cvlib.numbers(profile)
+        if args.variant:
+            try:
+                _cvlib.resolve(profile, args.variant)
+            except _cvlib.ProfileError as exc:
+                print(f"cv: {exc}", file=sys.stderr)
+                return 2
+            used = _cvlib.variant_ids(profile, args.variant)
+            rows = [r for r in rows if r[0] in used]
+        for owner, num, path in rows:
+            print(f"{owner}\t{num}\t{path}")
+        return 0
+
+    try:
+        data = _cvlib.resolve(profile, args.variant)
+        cmd = typst_cmd()
+    except _cvlib.ProfileError as exc:
+        print(f"cv: {exc}", file=sys.stderr)
+        return 2
+    out_dir = Path(args.out).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    pdf = out_dir / f"cv-{args.variant}.pdf"
+    with tempfile.TemporaryDirectory(prefix="cv-") as tmp:
+        data_path = Path(tmp) / "data.json"
+        data_path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        run = subprocess.run(cmd + ["compile", "--root", "/", "--input", f"data={data_path}", str(TEMPLATE), str(pdf)],
+                             capture_output=True, text=True, env=os.environ.copy())
+    if run.returncode != 0:
+        print(f"cv: typst failed:\n{run.stderr.strip()}", file=sys.stderr)
+        return 2
+    print(f"cv: wrote {pdf}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

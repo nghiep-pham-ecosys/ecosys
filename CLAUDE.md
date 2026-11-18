@@ -89,5 +89,6 @@ Claude Code reads skills through `.claude/skills -> ../skills`. Kiro reads steer
 | `just ws-status` | One line per repo: branch, dirty count, ahead/behind, open PRs. |
 | `just ws-workspace` | Write the gitignored `nghiep-pham-ecosys.local.code-workspace`: public folders plus the private-manifest repos. |
 | `just ci` | Run the local checks: hook and tool tests, tracked-children, actionlint, gitleaks, denylist scan. |
+| `just cv <variant>` | Build a CV PDF from the vault profile facts into `private/vault/out/` (`just cv-check` lists every number with its fact id). |
 | `just jobs-check` | Run `tools/jobs/check` on `private/ops/jobs/applications.yaml`. |
 | `just review` `[P1]` | Build the weekly review draft. |
