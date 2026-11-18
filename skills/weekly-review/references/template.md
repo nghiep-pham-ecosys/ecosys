@@ -7,7 +7,7 @@ Every number names its source; unchecked numbers are marked *unverified*.
 ```markdown
 # Review <YYYY-Www> (<Mon YYYY-MM-DD> – <Sun YYYY-MM-DD>)
 
-Drafted in: <session S<n> YYYY-MM-DD-<slug>> · Finished by Nghiep: <date, minutes spent>
+Drafted in: <session S<n>, log YYYY-MM-DD-S<n>-nghiep-pham-ecosys.md> · Finished by Nghiep: <date, minutes spent>
 
 ## Hours per area
 | Area | Budget (h) | Planned (h) | Done (h) | WIP limit | In progress now |
