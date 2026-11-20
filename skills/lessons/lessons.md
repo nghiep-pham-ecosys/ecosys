@@ -60,6 +60,13 @@ to `guards.md` in the same PR.
 - Seen: ecosys#42, 2026-11-17
 - Guard: reviewer-correctness
 
+### Write the interpreter path out in full under ship-guard
+- Why: `P=.../.venv/bin/python; $P tools/...` was blocked by ship-guard ("command whose name is computed by the
+  shell") in a lane and in the main session → the hook refuses command names built from shell variables.
+- How: write `.venv/bin/python` (or the absolute path) literally in each command.
+- Seen: workspace session 11, 2026-11-20 (a ledger lane, then the main session)
+- Guard: hook ship-guard (blocks it; this lesson explains the fix)
+
 ## Verify and Done
 
 ### Copy a physical constant or citation from the primary table, never from memory
@@ -298,6 +305,15 @@ _No entries yet._
 - Seen: claude-for-everyone-vi#22 and vault#3, 2026-11-18
 - Guard: none yet (candidate: teach the hook about `.tmp-session/wt/` lanes)
 
+### A fact-check file in a public repo paraphrases private repo text
+- Why: the weekly fact-check quoted CI conditions, hook comments, issue sentences and file paths of a private course
+  repo word for word; the privacy review caught it before merge → the fact-check skill asks for evidence, and the
+  lane pasted the evidence it read.
+- How: in a public fact-check, cite private work by commit sha and paraphrase it; list paths and numbers only when they
+  are already public. Run reviewer-privacy on the weekly PR before merge.
+- Seen: lab-to-prod week 2026-W48 PR, 2026-11-20
+- Guard: reviewer-privacy pass in the lab-to-prod weekly issue Done-when; candidate: the fact-check skill says it
+
 ## Data and tools
 
 ### Run a src-layout package's tests with PYTHONPATH=src in a fresh worktree
@@ -351,3 +367,10 @@ _No entries yet._
 - Seen: tmpl-project v0.1, 2026-11-17
 - Guard: tmpl-project `scripts/install-tools` tests
 
+### Run lab-to-prod validate.py in a venv built from its requirements
+- Why: the system python3 has no Pillow, so a full `tools/validate.py` run crashes with ModuleNotFoundError: PIL,
+  while a `--week` run with no post folders passes → a lane could report a false "0 errors".
+- How: build a venv from `tools/requirements.txt` under `.tmp-session/<session>/` (or the worktree, gitignored) and
+  name it in the lane brief's Test line.
+- Seen: workspace session 11, 2026-11-20 (ledger lane)
+- Guard: none yet (candidate: validate.py imports PIL at the top so the failure is immediate)
