@@ -97,6 +97,11 @@ proposed items.
 - **Scripts that live longer than one turn** go to `.tmp-session/<session>/`, not to the agent scratchpad.
 - **External drafts** (post text, e-mails, application answers) are collected in `.tmp-session/drafts.md` for one
   approval at the end, unless Nghiep asks for one now.
+- **Midday check** (Nghiep, 2026-11-20). Sessions run Monday to Friday from the morning, in parallel with Claude
+  Chat, on the day's inbox checklist; there is no session on Saturday or Sunday. At about 12:00, prepend one inbox line
+  `<YYYY-MM-DD> · CC · S<n> · Báo cáo trưa <HH:MM> · ...` with the status of each checklist item and its evidence
+  link. No other report line until the end line (End step 8). The frame lives in `private/ops/plan/routine.yaml`
+  (`agent_sessions`).
 - **Keep going.** While there is work the session can do itself (an item in progress, a found side issue, a verify
   step), do it. Close only when Nghiep says so or everything left is blocked, with the blocker named.
 
