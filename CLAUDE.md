@@ -11,7 +11,9 @@
 
 This file replaces the global day-job rules for every session opened in this workspace.
 
-- No AWS commands, no day-job accounts, profiles or trackers.
+- No AWS commands, no day-job accounts or profiles. One exception (Nghiep, 2026-11-22): the hub may **read** the
+  day-job trackers (the Linear and Jira connectors) to report day-job progress in its own chat. Read-only; the report
+  is never written to a file, commit, issue, PR, Notion page or inbox line.
 - No `handoff.md`. Session state lives in `private/ops` (memory block and session log, skill `session`).
 - Claude Code plans from `private/ops/plan/master-plan.md`, `private/ops/plan/sessions.yaml` and the board. No Chat
   line is needed to start (ADR 0006).

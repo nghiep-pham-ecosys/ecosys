@@ -1,6 +1,6 @@
 ---
 name: daily-start
-description: The daily ritual of the hub (the long-running Claude Code Remote Control session) in the nghiep-pham-ecosys workspace. On "bắt đầu ngày làm việc" (or "start the day", "báo cáo sáng") it builds the morning report (calendar, job e-mails, board, jobs check, day-job reminder, industry news), makes sure today's lessons are in the study book, and proposes the day's checklist. On "chốt ngày" it writes the daily score. Use it every working morning in the hub, when Nghiep asks for today's lesson, or at the end of the day. It does not cover the session start and end rituals (session), the Sunday review (weekly-review), or the job pipeline rules (jobs).
+description: The daily ritual of the hub (the long-running Claude Code Remote Control session) in the nghiep-pham-ecosys workspace. On "bắt đầu ngày làm việc" (or "start the day", "báo cáo sáng") it builds the morning report (calendar, job e-mails, board, jobs check, day-job progress, industry news), makes sure today's lessons are in the study book, and proposes the day's checklist. On "chốt ngày" it writes the daily score. Use it every working morning in the hub, when Nghiep asks for today's lesson, or at the end of the day. It does not cover the session start and end rituals (session), the Sunday review (weekly-review), or the job pipeline rules (jobs).
 ---
 
 # daily-start
@@ -19,8 +19,10 @@ Gather in parallel, then write one short block per section, in this order:
    stage change. A stage change needs Nghiep's yes (`jobs`). Gmail not connected on this account → say so and skip.
 3. **Board.** `gh project item-list` or `just board-export --stdout`: items `In progress` and due this week.
 4. **Jobs.** `just jobs-check`: 30-day closure proposals, follow-ups, interview prep within 48 h.
-5. **Day job (reminder only).** The work block from the calendar, one line. Never read day-job trackers, mail or
-   repos from this workspace (root `CLAUDE.md`, spec §10.3).
+5. **Day job (read-only).** The work block from the calendar, then the trackers through the Linear and Jira
+   connectors: items assigned to Nghiep or updated in the last day, grouped as done / in progress / in review /
+   blocked, one line each. Report in the hub chat only: never write it to a file, commit, issue, Notion or the inbox
+   (root `CLAUDE.md`). Never write to the trackers. No connector on this account → say so and skip.
 6. **Tin ngành.** Two or three items from newsletters and alerts in Gmail from the last day, one line each with the
    link. No mail access → skip.
 7. **Bài học hôm nay.** Check `private/ops/learn/so-hoc.md` has a section for each study block today (§2). Missing →

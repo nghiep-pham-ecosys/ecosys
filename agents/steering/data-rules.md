@@ -30,6 +30,8 @@ Never list the names you want to hide in a public file. A public file that lists
 - Copied: ways of working only (rituals, lesson format, ship rules, folder pattern, ADR template).
 - Never copied: employer or client code, data, prompts, schemas, account ids, issue keys, internal names, screenshots. The same applies to teaching or other client work.
 - The day job shows up only as the weekly `work-block` item and as public-safe achievement text in `vault`.
+- Exception (Nghiep, 2026-11-22): the hub reads the day-job trackers read-only for a progress summary in its chat
+  (`skills/daily-start`). Nothing from that read is written anywhere.
 
 ## Where data goes
 
