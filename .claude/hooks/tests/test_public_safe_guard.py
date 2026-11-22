@@ -236,6 +236,20 @@ class PublicSafeGuardTest(unittest.TestCase):
         self.blocked("main-bash",
                      command=f"gh api graphql -f query='mutation {{ addComment(input: {{body: \"{TERM}\"}}) {{ id }} }}'")
 
+    def test_pass_fd_redirects_to_private_repo(self):
+        for redir in ("2>&1", ">&2", "1>&2", "&>/dev/null", "2>/dev/null"):
+            with self.subTest(redir=redir):
+                self.allowed("main-bash",
+                             command=f'gh pr create -R example-org/ops --title "feat: x" --body "about {TERM}" {redir}')
+
+    def test_pass_fd_redirect_in_public_cwd_without_write(self):
+        self.allowed("main-bash", command=f"grep -rn '{TERM}' docs 2>&1")
+
+    def test_block_file_redirects_into_public_repo(self):
+        for redir in ("> docs/x.md", ">> docs/x.md", "2> docs/x.md", "&> docs/x.md", "2>&1 > docs/x.md"):
+            with self.subTest(redir=redir):
+                self.blocked("main-bash", command=f"echo '{TERM}' {redir}")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1728,6 +1728,17 @@ def is_redirect(tok: str) -> bool:
     return bool(REDIRECT_RE.match(tok))
 
 
+FD_WORD_RE = re.compile(r"^(?:[0-9]+-?|-)$")
+
+
+def is_fd_dup(op, word) -> bool:
+    """True when `op word` duplicates or closes a file descriptor (`2>&1`,
+    `>&2`, `1>&-`, `>&3-`) instead of naming a file. The tokenizer splits
+    `2>&1` into `2`, `>&`, `1`; only `>&` (not `&>`) takes an fd number.
+    `>& file` and `&> file` still write the file."""
+    return str(op).rstrip("|").endswith(">&") and bool(FD_WORD_RE.match(str(word)))
+
+
 # Programs whose last plain argument (or -t value) is written, and programs
 # that write every plain argument. Used by ship-guard and public-safe-guard.
 COPY_LIKE = {"cp", "mv", "install", "ln", "rsync"}
@@ -1741,7 +1752,8 @@ def write_targets(info: dict) -> list:
     stand (Word objects or text); callers expand them with expand_path().
     """
     raw = info["raw"]
-    targets = [raw[k + 1] for k, t in enumerate(raw[:-1]) if is_redirect(t) and ">" in str(t)]
+    targets = [raw[k + 1] for k, t in enumerate(raw[:-1])
+               if is_redirect(t) and ">" in str(t) and not is_fd_dup(t, raw[k + 1])]
     cmd = info["core"]
     if not cmd:
         return targets

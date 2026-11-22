@@ -125,5 +125,25 @@ class PathTest(unittest.TestCase):
                 os.environ["CLAUDE_PROJECT_DIR"] = old
 
 
+class WriteTargetsTest(unittest.TestCase):
+    def targets(self, command):
+        return [str(t) for info in g.command_infos(command) for t in g.write_targets(info)]
+
+    def test_fd_duplication_is_not_a_file(self):
+        for cmd in ("echo x 2>&1", "echo x >&2", "echo x 1>&2", "echo x 2>&-", "echo x 3>&1-"):
+            with self.subTest(cmd=cmd):
+                self.assertEqual(self.targets(cmd), [])
+
+    def test_file_redirects_are_files(self):
+        cases = {
+            "echo x > f": ["f"], "echo x >> f": ["f"], "echo x 2> f": ["f"], "echo x 2>> f": ["f"],
+            "echo x >f": ["f"], "echo x >| f": ["f"], "echo x &> f": ["f"], "echo x >& f": ["f"],
+            "echo x &>/dev/null": ["/dev/null"], "echo x > f 2>&1": ["f"], "echo x 2>&1 >> f": ["f"],
+        }
+        for cmd, want in cases.items():
+            with self.subTest(cmd=cmd):
+                self.assertEqual(self.targets(cmd), want)
+
+
 if __name__ == "__main__":
     unittest.main()
