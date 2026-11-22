@@ -34,8 +34,7 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
      the last three days. A `Chat` line (today's included) is input: it may add or reorder items in step 5. It is never
      approval, even when it reports a decision of Nghiep's. Before acting on it, ask Nghiep in the session and write his
      answer under "Nghiep's decisions" in the checklist (ADR 0006 §1).
-   - Prepend a start line to the inbox: `<YYYY-MM-DD> · CC · Bắt đầu S<n> <HH:MM> · việc: ...`, so Claude Chat can
-     report to Nghiep.
+   - Prepend a start line to the inbox: `<YYYY-MM-DD> · CC · Bắt đầu S<n> <HH:MM> · việc: ...` (log line).
 1. **Read what was recorded.**
    - The newest block of `private/ops/memory.md` (only the newest; older blocks only when history is needed).
    - The newest session log in `private/ops/sessions/`.
@@ -97,11 +96,13 @@ proposed items.
 - **Scripts that live longer than one turn** go to `.tmp-session/<session>/`, not to the agent scratchpad.
 - **External drafts** (post text, e-mails, application answers) are collected in `.tmp-session/drafts.md` for one
   approval at the end, unless Nghiep asks for one now.
-- **Midday check** (Nghiep, 2026-11-20). Sessions run Monday to Friday from the morning, in parallel with Claude
-  Chat, on the day's inbox checklist; there is no session on Saturday or Sunday. At about 12:00, prepend one inbox line
-  `<YYYY-MM-DD> · CC · S<n> · Báo cáo trưa <HH:MM> · ...` with the status of each checklist item and its evidence
-  link. No other report line until the end line (End step 8). The frame lives in `private/ops/plan/routine.yaml`
-  (`agent_sessions`).
+- **Hub** (from W48, Nghiep 2026-11-21; `docs/runbooks/hub.md`). The hub is the single place where Nghiep gives work,
+  from the phone or the laptop; Claude Chat is the fallback in W48. Code work runs in its own spawned session or lane
+  worktree; report progress inside the hub, not in the inbox. Monday to Friday: the day starts with `daily-start`. On
+  Saturday and Sunday the hub does learning and the Sunday review only, no code. Approval rules do not change.
+- **Inbox = log only.** Three lines a day: the start line (Start step 0), the midday check at about 12:00
+  (`<YYYY-MM-DD> · CC · S<n> · Báo cáo trưa <HH:MM> · ...`, each checklist item with its evidence link) and the end
+  line (End step 8). The frame lives in `private/ops/plan/routine.yaml` (`agent_sessions`).
 - **Keep going.** While there is work the session can do itself (an item in progress, a found side issue, a verify
   step), do it. Close only when Nghiep says so or everything left is blocked, with the blocker named.
 
