@@ -32,6 +32,9 @@ On the phone: Claude app → Code tab → the session named `hub`. Allow notific
 ## Account
 
 - The hub runs on the claude.ai account the local client is signed into. Switch with `/login` inside the hub.
+- The hub is not listed in the app although it says "Connected" → compare `claude auth status` with the app's
+  account; on a mismatch run `claude auth logout` and `claude auth login`, start the hub again, then `/mcp` →
+  `notion-ecosys` → Authenticate in a normal `claude` session.
 - Remote Control sessions belong to that account: after `/login` to another account, open the app with the same
   account, or the hub is not listed.
 - claude.ai connectors (Gmail, Google Calendar, Google Drive) follow the signed-in account. The project MCP server
