@@ -46,7 +46,7 @@ On the phone: Claude app → Code tab → the session named `hub`. Allow notific
 | Notion inbox and pages | `notion-ecosys` | check the workspace with `notion-get-self` first |
 | Board, PRs, runs | `gh`, `just board-export` | |
 | Jobs | `just jobs-check` | |
-| Day-job trackers | not read | root `CLAUDE.md`: no day-job trackers here; the day job shows only as calendar blocks |
+| Day-job trackers | Linear and Jira connectors, read-only | progress summary in the hub chat only, never written anywhere (root `CLAUDE.md`, exception 2026-11-22) |
 | Industry news | Gmail newsletters and alerts | same account rule as Gmail |
 
 ## Stop
