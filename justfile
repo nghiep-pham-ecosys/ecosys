@@ -10,7 +10,7 @@ set tempdir := ".tmp-session/just"
 # python3 on PATH that can import yaml, then fall back to the system one.
 python := `for p in python3 /usr/bin/python3; do if command -v "$p" >/dev/null 2>&1 && "$p" -c 'import yaml' 2>/dev/null; then command -v "$p"; exit 0; fi; done; echo python3`
 
-test_dirs := ".claude/hooks/tests tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests tools/board/tests tools/cv/tests tools/hub/tests"
+test_dirs := ".claude/hooks/tests tools/ws/tests tools/ship/tests tools/jobs/tests tools/skills/tests tools/board/tests tools/cv/tests"
 
 # List the recipes
 default:
@@ -27,10 +27,6 @@ ws-status *args:
 # Write the gitignored local VS Code workspace: public folders plus the private-manifest repos
 ws-workspace *args:
     @{{python}} tools/ws/workspace "$@"
-
-# Start the Claude Code hub (Remote Control server, one worktree per session) in tmux (args: --no-tmux, --dry-run)
-hub *args:
-    @{{python}} tools/hub/start "$@"
 
 # Job pipeline checks on the private ops data, plus skipped.yaml when present (args: --today YYYY-MM-DD, --close-after-days N)
 jobs-check *args:

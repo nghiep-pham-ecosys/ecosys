@@ -12,7 +12,7 @@ day-job boundary (spec §10.3).
 |---|---|---|
 | [`core`](core/SKILL.md) | hard rules and their guards, roles, sources of truth, which skill when, issue and lane brief templates, language | P0 |
 | [`session`](session/SKILL.md) | session start and end rituals, live checklist, pending lessons, session log and memory block | P0 |
-| [`daily-start`](daily-start/SKILL.md) | "bắt đầu ngày làm việc" in the hub: morning report, today's lesson, daily score | P0 |
+| [`daily-start`](daily-start/SKILL.md) | "bắt đầu ngày làm việc" in the main session: morning report, today's lesson, daily score | P0 |
 | [`ship`](ship/SKILL.md) | branch → PR → checks → `tools/ship/merge` (stacks: `stack-merge`) → verify → Done with evidence; commit format | P0 |
 | [`lessons`](lessons/SKILL.md) | lesson format (Rule, Why, Seen, Guard), where to write, promotion to a guard; log in [`lessons/lessons.md`](lessons/lessons.md) | P0 |
 | [`jobs`](jobs/SKILL.md) | job pipeline stages and transitions, 30-day rule, form-filling rules, `tools/jobs/check`, sources | P0 |

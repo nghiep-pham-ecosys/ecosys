@@ -397,7 +397,7 @@ _No entries yet._
   with the app's account. On a mismatch run `claude auth logout`, `claude auth login`, then start the hub again.
   Project MCP servers such as `notion-ecosys` need `/mcp` → Authenticate again afterwards.
 - Seen: S12 hub setup, 2026-11-22
-- Guard: `docs/runbooks/hub.md` "Account"
+- Guard: `docs/runbooks/main-session.md` "Account check" (hub retired 2026-11-23)
 
 ### In a desktop-app worktree session, edit base-checkout files with the shell
 - Why: the app blocks Write/Edit outside the session's own worktree, while `worktree-guard` puts lanes under the

@@ -1,11 +1,13 @@
 ---
 name: daily-start
-description: The daily ritual of the hub (the long-running Claude Code Remote Control session) in the nghiep-pham-ecosys workspace. On "bắt đầu ngày làm việc" (or "start the day", "báo cáo sáng") it builds the morning report (calendar, job e-mails, board, jobs check, day-job progress, industry news), makes sure today's lessons are in the study book, and proposes the day's checklist. On "chốt ngày" it writes the daily score. Use it every working morning in the hub, when Nghiep asks for today's lesson, or at the end of the day. It does not cover the session start and end rituals (session), the Sunday review (weekly-review), or the job pipeline rules (jobs).
+description: The daily ritual of the main session (Claude Code in Claude Desktop on the personal account) in the nghiep-pham-ecosys workspace. On "bắt đầu ngày làm việc" (or "start the day", "báo cáo sáng") it builds the morning report (calendar, job e-mails, board, jobs check, day-job progress, industry news), makes sure today's lessons are in the study book, and proposes the day's checklist. On "chốt ngày" it writes the daily score. Use it every working morning in the main session, when Nghiep asks for today's lesson, or at the end of the day. It does not cover the session start and end rituals (session), the Sunday review (weekly-review), or the job pipeline rules (jobs).
 ---
 
 # daily-start
 
-The hub replaces Claude Chat's morning ritual from W48 (`docs/runbooks/hub.md`). Answer in Vietnamese.
+The main session runs the morning ritual; Claude Chat is the fallback (`docs/runbooks/main-session.md`).
+Answer in Vietnamese.
+First check the signed-in account (runbook, "Account check"): on the Team seat the personal Gmail is out of reach.
 Every line of the report comes from a live call in this turn, or is labelled *unverified*.
 
 ## 1. Morning report ("bắt đầu ngày làm việc")
@@ -21,7 +23,7 @@ Gather in parallel, then write one short block per section, in this order:
 4. **Jobs.** `just jobs-check`: 30-day closure proposals, follow-ups, interview prep within 48 h.
 5. **Day job (read-only).** The work block from the calendar, then the trackers through the Linear and Jira
    connectors: items assigned to Nghiep or updated in the last day, grouped as done / in progress / in review /
-   blocked, one line each. Report in the hub chat only: never write it to a file, commit, issue, Notion or the inbox
+   blocked, one line each. Report in the session chat only: never write it to a file, commit, issue, Notion or the inbox
    (root `CLAUDE.md`). Never write to the trackers. No connector on this account → say so and skip.
 6. **Tin ngành.** Two or three items from newsletters and alerts in Gmail from the last day, one line each with the
    link. No mail access → skip.
