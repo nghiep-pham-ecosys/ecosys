@@ -5,7 +5,8 @@ description: The daily ritual of the main session (Claude Code in Claude Desktop
 
 # daily-start
 
-The main session runs the morning ritual; Claude Chat is the fallback (`docs/runbooks/main-session.md`). Answer in Vietnamese.
+The main session runs the morning ritual; Claude Chat is the fallback (`docs/runbooks/main-session.md`).
+Answer in Vietnamese.
 First check the signed-in account (runbook, "Account check"): on the Team seat the personal Gmail is out of reach.
 Every line of the report comes from a live call in this turn, or is labelled *unverified*.
 

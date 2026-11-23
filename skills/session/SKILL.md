@@ -96,10 +96,11 @@ proposed items.
 - **Scripts that live longer than one turn** go to `.tmp-session/<session>/`, not to the agent scratchpad.
 - **External drafts** (post text, e-mails, application answers) are collected in `.tmp-session/drafts.md` for one
   approval at the end, unless Nghiep asks for one now.
-- **Main session** (Nghiep 2026-11-23; `docs/runbooks/main-session.md`). Claude Code in Claude Desktop on the personal account is the
-  single place where Nghiep gives work; Claude Chat is the fallback. Code work runs in a lane worktree; report progress
-  inside the main session, not in the inbox. Monday to Friday: the day starts with `daily-start`. On Saturday and
-  Sunday the main session does learning and the Sunday review only, no code. Approval rules do not change.
+- **Main session** (Nghiep 2026-11-23; `docs/runbooks/main-session.md`). Claude Code in Claude Desktop on the
+  personal account is the single place where Nghiep gives work; Claude Chat is the fallback. Code work runs in a lane
+  worktree; report progress inside the main session, not in the inbox. Monday to Friday: the day starts with
+  `daily-start`. On Saturday and Sunday the main session does learning and the Sunday review only, no code. Approval
+  rules do not change.
 - **Inbox = log only.** Three lines a day: the start line (Start step 0), the midday check at about 12:00
   (`<YYYY-MM-DD> · CC · S<n> · Báo cáo trưa <HH:MM> · ...`, each checklist item with its evidence link) and the end
   line (End step 8). The frame lives in `private/ops/plan/routine.yaml` (`agent_sessions`).

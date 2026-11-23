@@ -192,6 +192,7 @@ The daily digest (spec §8, Phase 1) is dropped before it was built. Its jobs mo
 - **2026-11-23:** retired the tmux hub (`just hub`, W48). Every `claude` process in WSL shares the CLI login that the
   day-job Team seat uses, so the hub could not reach the personal connectors. The main session is now Claude Code in
   Claude Desktop on the personal account (`docs/runbooks/main-session.md`); Claude Chat stays the fallback.
+  The Team-seat allowance of 2026-11-18 now covers lane and heavy-coding sessions only, not the main session.
 
 ## Follow-ups
 
