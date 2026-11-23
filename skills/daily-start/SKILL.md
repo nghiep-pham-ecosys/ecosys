@@ -17,6 +17,8 @@ Gather in parallel, then write one short block per section, in this order:
 1. **Lịch hôm nay.** `notion-calendar-list-events` (`notion-ecosys`, today 00:00–24:00, Asia/Ho_Chi_Minh), or the
    Google Calendar connector. Fixed blocks with times; the next free window for Claude Code work.
 2. **Mail tuyển dụng.** Gmail connector, `newer_than:1d` (Monday: `newer_than:3d`), job-related senders and words.
+   Exclude bot senders, follow `pageToken` until no page is left, and rescan at the start of the job-search block.
+   Security alerts are filtered by the connector: say so instead of reporting none.
    For each reply: which application (by `#id` from `private/ops/jobs/applications.yaml`), what it asks, the proposed
    stage change. A stage change needs Nghiep's yes (`jobs`). Gmail not connected on this account → say so and skip.
 3. **Board.** `gh project item-list` or `just board-export --stdout`: items `In progress` and due this week.

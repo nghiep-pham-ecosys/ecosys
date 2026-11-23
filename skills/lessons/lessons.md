@@ -330,6 +330,22 @@ _No entries yet._
 
 ## Data and tools
 
+### Page through every mail result in the morning scan, and rescan before the job block
+- Why: the scan read only the first page (about 30 of 112 threads), two job and community mails arrived after it,
+  and the Gmail connector silently filters security alerts → the report looked complete but was not.
+- How: exclude bot senders in the query, follow `pageToken` until none is left, and rerun the scan at the start of
+  the job-search block. Say that security alerts cannot be read through the connector instead of reporting none.
+- Seen: S13, 2026-11-23
+- Guard: `skills/daily-start/SKILL.md` §1 step 2
+
+### Validate YAML after a scripted edit, and chain merge and cleanup with `&&`
+- Why: a comment added inside a `{ … }` flow mapping swallowed the comma, CI `yaml` went red, and a `;`-chained
+  cleanup still switched to `main` and deleted the local branch after the merge tool refused.
+- How: run `python3 -c "import yaml; yaml.safe_load(open(p))"` before committing a scripted YAML edit; join merge
+  and cleanup steps with `&&`.
+- Seen: S13, 2026-11-23
+- Guard: none yet (candidate: a pre-commit yaml check in ops)
+
 ### Run a src-layout package's tests with PYTHONPATH=src in a fresh worktree
 - Why: `unittest discover` in a new worktree failed on import → CI installs the package first, a worktree does not.
 - How: run `PYTHONPATH=src python3 -m unittest discover -s tests`, or install it editable in a venv under
