@@ -189,6 +189,9 @@ The daily digest (spec §8, Phase 1) is dropped before it was built. Its jobs mo
 - **2026-11-18 (S10):** local sessions may run on the Claude Team seat (section 3, "Account"); the routines and Chat
   stay on the personal account, so routine prompts are changed on claude.ai or from a client signed into it.
 - Acceptance of this ADR needs Nghiep's own yes in a Claude Code session (section 1).
+- **2026-11-23:** retired the tmux hub (`just hub`, W48). Every `claude` process in WSL shares the CLI login that the
+  day-job Team seat uses, so the hub could not reach the personal connectors. The main session is now Claude Code in
+  Claude Desktop on the personal account (`docs/runbooks/main-session.md`); Claude Chat stays the fallback.
 
 ## Follow-ups
 

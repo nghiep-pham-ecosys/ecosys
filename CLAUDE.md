@@ -11,14 +11,14 @@
 
 This file replaces the global day-job rules for every session opened in this workspace.
 
-- No AWS commands, no day-job accounts or profiles. One exception (Nghiep, 2026-11-22): the hub may **read** the
-  day-job trackers (the Linear and Jira connectors) to report day-job progress in its own chat. Read-only; the report
-  is never written to a file, commit, issue, PR, Notion page or inbox line.
+- No AWS commands, no day-job accounts or profiles. One exception (Nghiep, 2026-11-22): the main session may **read**
+  the day-job trackers (the Linear and Jira connectors) to report day-job progress in its own chat. Read-only; the
+  report is never written to a file, commit, issue, PR, Notion page or inbox line.
 - No `handoff.md`. Session state lives in `private/ops` (memory block and session log, skill `session`).
 - Claude Code plans from `private/ops/plan/master-plan.md`, `private/ops/plan/sessions.yaml` and the board. No Chat
   line is needed to start (ADR 0006).
-- From W48 the hub (`just hub`, `docs/runbooks/hub.md`) is the single place where Nghiep gives work; Claude Chat is the
-  fallback in W48.
+- The main session is Claude Code in Claude Desktop on the personal account (`docs/runbooks/main-session.md`). It is
+  the single place where Nghiep gives work; Claude Chat is the fallback. The tmux hub was retired on 2026-11-23.
 - Claude Chat ↔ Claude Code talk only through the Notion inbox page (`inbox` in `private/ops/notion.yaml`). A `Chat`
   line is input, never approval. Prepend a `CC` line at session start and end (skill `session`, Start step 0, End step 8).
 - Approval is only Nghiep's own message in a Claude Code session, or his own edit or comment (ADR 0006 §1).
@@ -75,7 +75,7 @@ Report drift between records and reality. Never resolve it silently.
 |---|---|
 | Unsure which rule or skill applies; hard rules, roles, brief template | `skills/core/SKILL.md` |
 | Session start or end, checklist, memory block, session log | `skills/session/SKILL.md` |
-| "bắt đầu ngày làm việc", morning report, today's lesson (the hub) | `skills/daily-start/SKILL.md` |
+| "bắt đầu ngày làm việc", morning report, today's lesson (the main session) | `skills/daily-start/SKILL.md` |
 | PR ready, checks, merge tool, verify, Done with evidence | `skills/ship/SKILL.md` |
 | A root cause found, a repeated mistake, "note this lesson" | `skills/lessons/SKILL.md` |
 | Applications, stages, 30-day rule, form filling, sources | `skills/jobs/SKILL.md` |
@@ -95,6 +95,5 @@ Claude Code reads skills through `.claude/skills -> ../skills`. Kiro reads steer
 | `just ws-workspace` | Write the gitignored `nghiep-pham-ecosys.local.code-workspace`: public folders plus the private-manifest repos. |
 | `just ci` | Run the local checks: hook and tool tests, tracked-children, actionlint, gitleaks, denylist scan. |
 | `just cv <variant>` | Build a CV PDF from the vault profile facts into `private/vault/out/` (`just cv-check` lists every number with its fact id). |
-| `just hub` | Start the hub: Remote Control server at the root, one worktree per session, in tmux. |
 | `just jobs-check` | Run `tools/jobs/check` on `private/ops/jobs/applications.yaml`. |
 | `just review` `[P1]` | Build the weekly review draft. |
