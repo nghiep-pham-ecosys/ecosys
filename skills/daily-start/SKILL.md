@@ -31,6 +31,12 @@ Gather in parallel, then write one short block per section, in this order:
    link. No mail access → skip.
 7. **Bài học hôm nay.** Check `private/ops/learn/so-hoc.md` has a section for each study block today (§2). Missing →
    write it now.
+8. **Bài đăng.** Today's post in `projects/lab-to-prod/content/<week>/<date>-*/post.md` (`channels`), against the
+   `<date>` entry of `published.json` on the `publish-state` branch, and the `publish.yml` runs of today. GitHub cron
+   runs late or not at all (lab-to-prod#32), so a channel missing after 08:15 is reported with the fix: with Nghiep's
+   yes, `gh workflow run publish.yml -R <org>/lab-to-prod -f event=daily`. A dispatch skips every channel already in
+   `published.json`, so it never posts twice. Also list the manual channels (`x_manual`, see `x-schedule.md`) for
+   Nghiep to check himself.
 
 Then propose the day's checklist (3–6 items, each with "xong khi") from the master plan, `sessions.yaml`, the board
 and the inbox. Nghiep's answer goes under "Nghiep's decisions" in `.tmp-session/checklist.md` (`session`).
