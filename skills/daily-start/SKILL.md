@@ -35,8 +35,13 @@ Gather in parallel, then write one short block per section, in this order:
    `<date>` entry of `published.json` on the `publish-state` branch, and the `publish.yml` runs of today. GitHub cron
    runs late or not at all (lab-to-prod#32), so a channel missing after 08:15 is reported with the fix: with Nghiep's
    yes, `gh workflow run publish.yml -R <org>/lab-to-prod -f event=daily`. A dispatch skips every channel already in
-   `published.json`, so it never posts twice. Also list the manual channels (`x_manual`, see `x-schedule.md`) for
-   Nghiep to check himself.
+   `published.json`, so it never posts twice. Check the days before today in the same week too: a missed day is
+   reported the same way.
+   X (`x_manual`) is posted by the main session through Claude in Chrome, not by Claude Chat (Nghiep, 2026-11-24).
+   The text, image and alt text come from the merged `x-schedule.md`, which Nghiep approved in the weekly content PR.
+   Steps, from the lab-to-prod root: `python tools/state_sync.py pull`, `python -m publish.record_manual check --key <date> --channel x` and a search of the live profile; post
+   with the image and alt text; reply with the blog link once the note URL returns 200; then `record` the post and
+   the reply (key `<date>:reply`) and `python tools/state_sync.py push published.json`.
 
 Then propose the day's checklist (3–6 items, each with "xong khi") from the master plan, `sessions.yaml`, the board
 and the inbox. Nghiep's answer goes under "Nghiep's decisions" in `.tmp-session/checklist.md` (`session`).
