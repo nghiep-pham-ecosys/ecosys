@@ -18,8 +18,8 @@ to `guards.md` in the same PR.
 - Why: a brief composed `unittest discover -s <abs>/tests -t <abs-root>`, which fails in a repo whose `tests/` has
   no `__init__.py` → the command was written from memory, not taken from the repo.
 - How: paste the test command exactly as the README or the CI workflow runs it, with `cd <worktree>` in a subshell.
-- Seen: process-sim-lab lane, 2026-11-18
-- Guard: none yet; candidate: the brief template's `Test:` line says "copied from README or CI"
+- Seen: process-sim-lab lane, 2026-11-18; S15 2026-11-25 (brief said `just ci` in a repo with no justfile)
+- Guard: the lane brief template's `Test:` line now says "copied from the repo's README or CI" (skills/core issue-and-brief, S15)
 
 ### Check which Notion workspace a session reaches before the first Notion call
 - Why: at session start the inbox page returned 404 and no routines were listed → the client was signed into another
@@ -50,8 +50,9 @@ to `guards.md` in the same PR.
 - Why: physic-ai-for-everyone#16 said lesson 01 had no exercises, but 4 existed; only the test that runs them was
   missing → the issue's premise was taken as fact.
 - How: grep the repo for the thing first; build only the gap and say so in the PR.
-- Seen: physic-ai-for-everyone#16, 2026-11-17
-- Guard: lane brief "Read first" (skills/core issue-and-brief)
+- Seen: physic-ai-for-everyone#16, 2026-11-17; process-sim-lab#30, 2026-11-25 (an issue opened from a plan line for
+  work merged a week earlier)
+- Guard: "Before creating" step 2 in skills/core issue-and-brief now runs `git log` and a grep for the feature (S15)
 
 ### A rule that sorts items by a field names where the field lives
 - Why: the two-budget rule split items by owner, but no board field or issue section held an owner → an agent could
@@ -429,3 +430,52 @@ _No entries yet._
 - How: change those files with short shell scripts and check them with the repo's own validator.
 - Seen: S12, 2026-11-22
 - Guard: none (this lesson)
+
+## Session S15 (2026-11-25)
+
+### Gate cleanup on the merge verdict, never on a pipeline
+- Why: `tools/ship/merge ... | tail -1 && git worktree remove ...` cleaned up and closed the issue although the merge
+  was refused: a pipeline's exit status is its last command's.
+- How: write the merge output to a file, then `grep -q "VERDICT: MERGED"` before any cleanup.
+- Seen: S15, 2026-11-25 (lab-to-prod#56)
+- Guard: none yet (candidate: a `--then-clean` option on tools/ship/merge)
+
+### Run at most one heavy lane at a time on the laptop
+- Why: four lanes plus an editor filled RAM and swap; two lanes were loading TTS models and rendering with ffmpeg,
+  and WSL restarted, killing every agent process.
+- How: one model or render lane at a time, at most two light lanes beside it; check `free -m` before a start.
+- Seen: S15, 2026-11-25
+- Guard: the lane queue limits (heavy 1, light 2) and the dispatcher's free-memory check
+
+### Read free disk space from the Windows drive in WSL
+- Why: `df -h /` shows the WSL virtual disk's maximum size (about 1 TB), not the space left on the Windows drive that
+  holds it (about 30 GB).
+- How: report `df -h /mnt/c /mnt/d` next to `du -sh ~`; plan models and renders against the Windows drive.
+- Seen: S15, 2026-11-25
+- Guard: `just disk` in nghiep-motion-studio prints both
+
+### Kill a test process by its PID, never by a command-line pattern
+- Why: `pkill -f <pattern>` matched the lane's own shell and killed it (exit 144).
+- How: `pgrep -P <parent>` or the PID a launcher printed; or start servers under `timeout N`.
+- Seen: S15 lanes psl-26 and ms-13, 2026-11-25
+- Guard: the lane brief template's Constraints line says "kill by PID only" (S15)
+
+### Leave claude.ai links out of commits to public repos
+- Why: a lane commit carried a session trailer that links to claude.ai; public repos forbid claude.ai links.
+- How: lane briefs for public repos allow only the Co-Authored-By trailer; the squash merge drops the rest.
+- Seen: S15 lane psl-32, 2026-11-25
+- Guard: none yet (candidate: a commit-msg hook in public repos that rejects claude.ai)
+
+### Check a new folder against .gitignore before committing it
+- Why: the pattern `site/` (no leading slash) ignores every folder named site, so a new docs/site folder vanished
+  from git status.
+- How: `git check-ignore -v <new path>` before the first commit of a folder; anchor patterns with a leading slash.
+- Seen: S15 lane cfe-5, 2026-11-25
+- Guard: none (this lesson)
+
+### Measure Vietnamese subtitle drift with a large speech model
+- Why: faster-whisper base matched 103 of 214 Vietnamese cues and failed the drift gate; large-v3-turbo matched 132
+  and passed on the same file.
+- How: pick the drift model per language; print the worst cues before loosening any limit.
+- Seen: S15 pilot render, 2026-11-25
+- Guard: nghiep-motion-studio#30
