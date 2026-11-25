@@ -42,6 +42,14 @@ Gather in parallel, then write one short block per section, in this order:
    Steps, from the lab-to-prod root: `python tools/state_sync.py pull`, `python -m publish.record_manual check --key <date> --channel x` and a search of the live profile; post
    with the image and alt text; reply with the blog link once the note URL returns 200; then `record` the post and
    the reply (key `<date>:reply`) and `python tools/state_sync.py push published.json`.
+   Personal Facebook: every day the main session shares the day's Facebook Page post to Nghiep's personal profile
+   through Claude in Chrome (Nghiep, 2026-11-25). Open the Page post URL from the `facebook` entry of
+   `published.json`, check the share dialog shows his own name, Feed and Public, and press "Share now" with no added
+   text. Check the profile timeline first so a day is never shared twice. No API and no record in `published.json`.
+   Telegram stays skipped until its token is set: report it as "not configured", not as a missed post.
+9. **Trang theo dõi.** Rebuild and republish the two private pages in `private/ops/pages/` (README there): the study
+   book by day and the project map. Update the hand-written text of a repo in the project map when it shipped
+   something since the last rebuild. Give both links in the report.
 
 Then propose the day's checklist (3–6 items, each with "xong khi") from the master plan, `sessions.yaml`, the board
 and the inbox. Nghiep's answer goes under "Nghiep's decisions" in `.tmp-session/checklist.md` (`session`).
@@ -56,6 +64,7 @@ and the inbox. Nghiep's answer goes under "Nghiep's decisions" in `.tmp-session/
 - Material comes from real work where the block says so (the day's lab-to-prod post, a merged PR). Never post graded
   course code anywhere public.
 - Write the next working day's lessons at the evening close, so the morning only checks them.
+- After the lessons are written, rebuild the study-book page (`private/ops/pages/sohoc`) so each day has its tab.
 - Commit `ops` changes through the normal flow (`ship`).
 
 ## 3. Close of day ("chốt ngày")
