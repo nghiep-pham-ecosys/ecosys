@@ -23,6 +23,8 @@ Every issue goes on the org board with `Area`, `Status`, `Estimate (h)` and, whe
 1. Ask Nghiep first (batch several).
 2. Search for duplicates: `gh issue list -R <org>/<repo> --search "<2–3 keywords>" --state all`. A close match →
    comment on it or widen its scope instead.
+   Also check the work is not already merged: `git -C <repo> log --oneline -20` and a grep for the feature; write
+   only the missing part into Done when.
 3. Pick the repo with the table above. In a public repo, re-read the title and body for names and numbers before
    creating (public-safe rule, spec §10.2).
 
@@ -76,7 +78,8 @@ Worktree: /home/nghiep/projects/nghiep-pham-ecosys/.tmp-session/wt/<session>-<la
 Read first: CONTEXT.md · <repo>/CLAUDE.md · lessons for <areas>
 Done when: <copied from the issue, unchanged>
 Files in scope: <paths>
-Test: just ci (in the target repo)
+Test: <copied from the repo's README or CI workflow; `just ci` only when the repo has a justfile>
+Constraints: kill test processes by PID only, never `pkill -f`; public repo: Co-Authored-By is the only commit trailer
 Ending: commit `<type>: …` with body `Refs <repo>#<n>`; do NOT push, open PRs, merge, run workflows or open secret paths;
 return JSON {ready, blocked_reason, branch, commits, summary, followups, lessons}
 ```
