@@ -246,6 +246,14 @@ _No entries yet._
 - Seen: lab-to-prod#29, 2026-11-16; lab-to-prod#32, 2026-11-17
 - Guard: ci lab-to-prod publish.yml and blog.yml early crons plus `tools/wait_until.py` (lab-to-prod#33)
 
+### Check every post channel in the morning report, earlier days included
+- Why: on 2026-11-24 none of the four publish crons had run by 09:40, and the X posts of 23/11 and 24/11 were
+  missing; the report had no posts section, so Nghiep found the gap himself.
+- How: compare the week's posts with `published.json` on the state branch and today's publish runs; dispatch the
+  publish workflow on a missed channel (it skips what is recorded) and post manual channels with a record.
+- Seen: S14, 2026-11-24 (cron lateness: lab-to-prod#32, 2026-11-17)
+- Guard: `skills/daily-start/SKILL.md` §1 step 8 (ecosys#71, ecosys#72)
+
 ## Public-safe and privacy
 
 ### Strip claude.ai session links from routine PRs before the merge
