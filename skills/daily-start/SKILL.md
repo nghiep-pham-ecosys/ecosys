@@ -10,6 +10,13 @@ Answer in Vietnamese.
 First check the signed-in account (runbook, "Account check"): on the Team seat the personal Gmail is out of reach.
 Every line of the report comes from a live call in this turn, or is labelled *unverified*.
 
+## 0. Open the session number first
+
+"Bắt đầu ngày làm việc" also starts the day's session: one working day = one `S<n>` (Nghiep, 2026-11-25). Before
+the report, take the next number from `private/ops/sessions/README.md` (`session`, "Session number and handover"),
+put it in the checklist header and the inbox start line, and ask Nghiep to name the Desktop session
+`DD/MM/YYYY_S<n>`. A later "bắt đầu session mới" on the same day continues that number; it never opens a second one.
+
 ## 1. Morning report ("bắt đầu ngày làm việc")
 
 Gather in parallel, then write one short block per section, in this order:

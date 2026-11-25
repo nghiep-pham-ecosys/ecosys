@@ -103,7 +103,9 @@ force push, no deletion.
 - CI on `main` green: `gh run list -R <org>/<repo> --branch main --limit 3`.
 - Something deployed or published by the merge (blog, Pages site, scheduled workflow): verify the real thing. A URL
   returns 200 with the expected content, or the workflow run is green. Record the link or command output.
-- Pull the merged `main` into the local clone (`just ws-sync`) and remove the worktree.
+- Pull the merged `main` into the local clone (`just ws-sync`) and remove the worktree right after the merge: the lane
+  worktree under `.tmp-session/wt/`, or the Desktop worktree under `.claude/worktrees/` once its session is done, with
+  its local branch (`git worktree remove <path> && git branch -D <branch>`). Old worktrees fill the disk.
 - The merged PR changed `skills/core`, `skills/jobs`, `skills/lessons` or `skills/weekly-review` (the skills Nghiep
   uploads to Claude Chat, which does not sync with the repo): run `just skills-zip` and prepend one line to the Notion
   inbox: `<YYYY-MM-DD> · CC · cần upload: <name>.zip` (files in `dist/skills/`). `session` and `ship` are used only in
