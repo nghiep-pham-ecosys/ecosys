@@ -34,3 +34,18 @@ Use a multi-repo workspace in one GitHub org, `nghiep-pham-ecosys`.
 ## Revisit when
 
 Two repos need to share code and copying it becomes a chore. Then add a `packages` repo or merge just those two.
+
+## Note 2026-11-25: two course repos go public
+
+- `claude-for-everyone-vi` and `physic-ai-for-everyone` went from private to public on Nghiep's yes (session S15).
+- Checks before the switch: gitleaks over the full history, a denylist scan of every blob in the history, and a
+  reviewer-privacy pass. They found a personal e-mail in commit metadata and in a few files, private tracker ids, and
+  one old blob with a banned term.
+- Fix: the files were corrected, then `git filter-repo` rewrote the history (e-mail to the GitHub noreply address,
+  ids redacted, the old blob replaced). Both scans were clean on the rewritten history.
+- A force-push does not purge old commits, because pull-request refs keep them reachable. So each old repo was renamed
+  to `<name>-archive` and stays private, and a new public repo with the original name received the rewritten history.
+  Old issues and pull requests stay in the archive. The `main-protection` ruleset and squash-only merges were set on
+  the new repos.
+- Consequence: a hosting project linked to the old repo (for example the docs site of `physic-ai-for-everyone`) must
+  be relinked to the new repo by hand.
