@@ -15,6 +15,8 @@ Chat with Nghiep in Vietnamese. Files in public repos stay in English.
   `.tmp-session/checklist.md` keeps its number.
 - The number goes in the checklist header, the log title, the index row, the memory block heading and every inbox
   line of the session (`CC · S<n> · ...`).
+- One working day = one number (Nghiep, 2026-11-25). `daily-start` opens it in the morning; a later "bắt đầu session
+  mới" the same day continues it in the same checklist, even from a new Desktop worktree.
 - Handover (for example Claude Code hits its limit and Kiro continues): the next agent reads
   `.tmp-session/checklist.md` first, keeps the same `S<n>`, adds its name to the checklist `Agent:` line, and goes on
   from the first open item. The log records both agents. The checklist is the only handover note: no new handoff files.
@@ -127,7 +129,9 @@ The log is written last, from checked facts, not from what the session remembers
    so Claude Chat, which cannot read GitHub Projects, sees the board. It is committed with the session log.
 6. **Write** the session log `private/ops/sessions/YYYY-MM-DD-S<n>-nghiep-pham-ecosys.md` and **prepend** the memory block to
    `private/ops/memory.md`. Formats: [`references/log-and-memory.md`](references/log-and-memory.md).
-7. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`); the session's
+7. **Clean.** Every repo on a clean default branch; worktrees removed (`git worktree remove`), lane worktrees under
+   `.tmp-session/wt/` and Desktop worktrees under `.claude/worktrees/` whose branch is merged or has no commits of
+   its own (never the running session's; delete the local branch too, to keep disk use down); the session's
    `.tmp-session` files deleted after their content is in the log. Commit `ops` changes through the normal flow.
 8. **Mirror to Notion** through `notion-ecosys`, only after `notion-get-self` names the personal workspace (Start
    step 0); otherwise say so and skip. Ids and what each
