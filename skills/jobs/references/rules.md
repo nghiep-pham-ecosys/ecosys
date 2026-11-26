@@ -53,14 +53,25 @@ out. Nghiep confirms each closure (`jobs` §3).
 
 ## 6. Scope of roles
 
-- AI and ML engineering roles at mid and senior level, not only senior or lead.
-- Remote roles outside AI that fit the background: data and automation, Vietnamese-language evaluation or
-  translation, chemistry and environmental engineering.
-- AI trainer, annotation and AI evaluation work, preferring tasks that fit the background (technical chemistry,
-  Python and coding agents, Vietnamese).
-- Applied science roles in environment, climate and energy.
+Narrowed on 2026-11-26 after a funnel review (details and numbers in `private/ops/jobs/`):
+
+- Two target profiles only: AI/LLM engineer, and forward deployed or solutions engineer, at mid and senior level.
+  Each profile has one fixed CV variant.
+- Not proposed any more: AI trainer, annotation and evaluation gigs, market research, and engineering roles outside
+  the two profiles.
 - Remote first, ideally companies based in Nghiep's country. Hybrid or on-site roles near home may still be proposed.
 - Pay floor and bands: private file only.
+
+### Next steps after a reply
+
+- For a role in the two profiles, a take-home or an interview is taken, not withdrawn. A take-home is capped at 4 h;
+  a longer one goes to Nghiep before it starts.
+- An interview in English is prepared in the English study block, not declined.
+
+### Channels
+
+- Recruiters, direct contacts and referrals come first. One-click applies only for a very close fit.
+- Every application carries the public portfolio links from `private/ops/jobs/form-data.md`.
 
 ## 7. Browser notes
 
