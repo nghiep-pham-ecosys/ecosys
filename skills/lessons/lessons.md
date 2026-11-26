@@ -479,3 +479,26 @@ _No entries yet._
 - How: pick the drift model per language; print the worst cues before loosening any limit.
 - Seen: S15 pilot render, 2026-11-25
 - Guard: nghiep-motion-studio#30
+
+### Give a web composer focus before typing into it
+- Why: text typed while a social site's composer had no focus was read as keyboard shortcuts; the page jumped to the
+  shortcut list and the explore page. Nothing was liked or reposted only because the timeline was still loading.
+- How: open the composer, take a screenshot that shows the caret in the text box, then type.
+- Seen: S16 manual post, 2026-11-26
+- Guard: none (this lesson)
+
+### Never name a hash field "key"
+- Why: a manifest field `"key"` holding a 16-hex hash failed the secret scan (generic-api-key) in CI, and the
+  full-history scan kept failing after the rename because the old branch still held the commit.
+- How: name such fields `params_hash` or `id`; run `gitleaks git --log-opts=origin/main..HEAD` on a lane branch
+  before pushing; an old false positive goes into `.gitleaksignore` by fingerprint.
+- Seen: S16 lane ms-34, 2026-11-26
+- Guard: the gitleaks step in the lane brief template
+
+### Send work to the lane terminal yourself
+- Why: the main session asked the owner to paste prompts into the lane terminal, though both are local Claude Code
+  sessions that can message each other; the owner did copy work the agent could do.
+- How: find the lane terminal with the agents list and send it queue starts and scope changes; have it message back
+  when a lane is ready. Ask the owner only to open that terminal when none is running.
+- Seen: S15 and S16, 2026-11-25 and 2026-11-26
+- Guard: none yet (runbook main-session to update)
