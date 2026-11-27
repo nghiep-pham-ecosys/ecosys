@@ -54,7 +54,19 @@ Gather in parallel, then write one short block per section, in this order:
    `published.json`, check the share dialog shows his own name, Feed and Public, and press "Share now" with no added
    text. Check the profile timeline first so a day is never shared twice. No API and no record in `published.json`.
    Telegram stays skipped until its token is set: report it as "not configured", not as a missed post.
-9. **Trang theo dõi.** Rebuild and republish the two private pages in `private/ops/pages/` (README there): the study
+9. **Bình luận.** Find new comments on the posts of the last 7 days, draft replies, and post them after one
+   approval for the whole batch (Nghiep, 2026-11-27). Each reply speaks for Nghiep, so it needs his yes (ADR 0003).
+   - Find: the Gmail connector, `newer_than:1d` (Monday `newer_than:3d`), the comment notifications from LinkedIn,
+     X, Facebook and YouTube. Mail only says which post has something new; read the thread at the source.
+   - YouTube and the Facebook Page: run the lab-to-prod `comments.yml` workflow with `mode=list`. After the yes,
+     run it with `mode=reply` and the approved replies (lab-to-prod#61). A Facebook reply needs the
+     `pages_manage_engagement` scope on the Page token.
+   - LinkedIn and X: open only the posts that have new comments in Claude in Chrome, read the whole thread (sort
+     LinkedIn by "Most recent"), and reply under the right comment.
+   - Draft in English and in Nghiep's voice. Use only facts from the post, the blog note and his earlier replies.
+     Never promise a date or a feature he has not stated. Skip spam and sales pitches, and list them as skipped.
+   - Report each comment in one line: who, the post, the gist, and the draft reply. Ask one question: post all?
+10. **Trang theo dõi.** Rebuild and republish the two private pages in `private/ops/pages/` (README there): the study
    book by day and the project map. Update the hand-written text of a repo in the project map when it shipped
    something since the last rebuild. Give both links in the report.
 
