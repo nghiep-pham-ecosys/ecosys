@@ -64,7 +64,8 @@ Gather in parallel, then write one short block per section, in this order:
    - LinkedIn and X: open only the posts that have new comments in Claude in Chrome, read the whole thread (sort
      LinkedIn by "Most recent"), and reply under the right comment.
    - Draft in English and in Nghiep's voice. Use only facts from the post, the blog note and his earlier replies.
-     Never promise a date or a feature he has not stated. Skip spam and sales pitches, and list them as skipped.
+     Never promise a date or a feature he has not stated. A YouTube or Facebook reply never names or quotes the
+     commenter (its text is public in the lab-to-prod run log). Skip spam and sales pitches, and list them as skipped.
    - Report each comment in one line: who, the post, the gist, and the draft reply. Ask one question: post all?
 10. **Trang theo dõi.** Rebuild and republish the two private pages in `private/ops/pages/` (README there): the study
    book by day and the project map. Update the hand-written text of a repo in the project map when it shipped
