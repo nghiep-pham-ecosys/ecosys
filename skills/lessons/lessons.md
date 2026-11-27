@@ -502,3 +502,18 @@ _No entries yet._
   when a lane is ready. Ask the owner only to open that terminal when none is running.
 - Seen: S15 and S16, 2026-11-25 and 2026-11-26
 - Guard: none yet (runbook main-session to update)
+
+### Check each open checklist line before you report what is left
+- Why: at the end of a long day the agent listed five "open" items that the owner had finished hours earlier; it read
+  them from checklist lines nobody had ticked → the checklist was treated as live status without checking it.
+- How: before listing open work, check each open line against its source (the tracker file, `gh`, the chat), and tick
+  a line the moment the owner says it is done.
+- Seen: S16, 2026-11-27
+- Guard: none yet (candidate: a step in the session ritual before any "what is left" report)
+
+### A repo without the standard checks needs `--require` on the merge tool
+- Why: `tools/ship/merge` refused a green lab-to-prod PR because that repo runs `validate`, not `ci-result` and
+  `pr-title` → the default required checks do not fit every repo.
+- How: pass `--require validate` for lab-to-prod; read a repo's check names on its last PR before the first merge.
+- Seen: S16, 2026-11-27
+- Guard: none yet (candidate: per-repo required checks in repos.yaml)
