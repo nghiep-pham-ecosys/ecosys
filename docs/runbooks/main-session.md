@@ -42,6 +42,24 @@ Run this first when a connector fails:
 | Jobs | `just jobs-check` | |
 | Day-job trackers | Linear and Jira connectors, read-only | summary in the session chat only, never written anywhere (root `CLAUDE.md`, exception 2026-11-22); skipped when the personal account has no such connector |
 
+## Heavy work: the lane terminal
+
+Heavy coding, renders and model runs go to one Claude Code terminal at the workspace root on the Team seat (memory
+`one-terminal-lane-dispatcher`). It runs the queue in `.tmp-session/lanes.yaml` with `.tmp-session/briefs/dispatcher.md`.
+
+The main session drives that terminal itself. Nghiep only approves the plan; he never copies text between sessions.
+
+1. Write the brief in `.tmp-session/briefs/<id>.md` from `_template.md` and add the lane to `lanes.yaml` as `queued`.
+2. Find the terminal with `ListAgents`. It shows as a local interactive session at the workspace root.
+3. Send it the work with `SendMessage`: the lane id, the brief path, and "start it now per dispatcher.md". The same
+   channel carries scope changes to a running lane.
+4. The terminal answers with a `LANE <id> ready|blocked` line to the main session and writes `lanes-status.md`.
+5. The main session checks the result itself (frames, tests, gate), pushes, opens the PR, merges with
+   `tools/ship/merge`, cleans the worktree and sets the lane to `merged`.
+
+The main session cannot start the terminal. When `ListAgents` shows none, ask Nghiep once to run `claude` at the
+workspace root.
+
 ## Day job
 
 The day job keeps its own Claude Code in VS Code on the Team seat. That session never opens this workspace, and the
