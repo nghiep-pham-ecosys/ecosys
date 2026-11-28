@@ -517,3 +517,27 @@ _No entries yet._
 - How: pass `--require validate` for lab-to-prod; read a repo's check names on its last PR before the first merge.
 - Seen: S16, 2026-11-27
 - Guard: none yet (candidate: per-repo required checks in repos.yaml)
+
+## Session S17 (2026-11-28)
+
+### Check cloud service limits against the current docs before writing study material
+- Why: a first study page used limits from memory (Lambda 15 minutes, S3 objects 5 TB, gp3 16,000 IOPS, a retired
+  ledger database); the provider had changed all of them in the last year → numbers in teaching material go stale fast.
+- How: every limit in study notes cites the provider page opened while writing; content lanes must leave a figure out
+  when no page confirms it; note old values where practice tests still use them.
+- Seen: S17, 2026-11-28 (six stale figures found by the content lanes and the orchestrator)
+- Guard: the notes generator rejects a figure without a source URL
+
+### Leave a lane worktree before pushing from the main clone
+- Why: after editing in a lane worktree the session's working directory stayed there, so `git -C <main clone> push`
+  was refused by the ship guard as a lane push.
+- How: `cd` back to the workspace root in its own command first, then push from the main clone.
+- Seen: S17, 2026-11-28
+- Guard: the ship guard (works as designed); this note explains the refusal
+
+### Use absolute paths when a command touches folders outside the workspace
+- Why: the public-safe guard resolves relative paths against the workspace, so `cd /mnt/d/...` followed by a
+  relative write looked like a write into the public repo and was blocked.
+- How: give every path outside the workspace in full, including in `cp`, `mv` and redirects.
+- Seen: S17, 2026-11-28 (twice)
+- Guard: the public-safe guard (blocks the write); this note explains the refusal
